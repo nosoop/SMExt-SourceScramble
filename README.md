@@ -81,7 +81,7 @@ This should be fairly self-explanatory:
 // patches are cleaned up when the handle is deleted (which occurs when the owning plugin is unloaded)
 MemoryPatch patch = MemoryPatch.CreateFromConf(hGameConf, "CTraceFilterObject::ShouldHitEntity()::patch_tfbot_building_collisions");
 
-if (!patch.Verify()) {
+if (!patch.Validate()) {
 	PrintToServer("[patchmem] Failed to verify patch.");
 } else if (patch.Enable()) {
 	PrintToServer("[patchmem] Enabled patch.");
