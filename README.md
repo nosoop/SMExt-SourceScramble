@@ -5,7 +5,10 @@ patches stored in game configuration files.
 
 ## Origin
 
-I just got really tired of writing plugin boilerplate for memory patching shenanigans.
+I just got really tired of writing plugin boilerplate for good, clean, memory patching
+shenanigans.  I've written a number of them for public / private purposes, and they've been
+generally a pain.
+
 [This is the most recent one I've written.][bot-collide]  The problems that stand out to me are:
 
 1.  Hardcoded, platform-specific patch payload.
@@ -18,10 +21,14 @@ SourceMod's built-in memory access functions are very powerful, but also very pr
 Additionally, there is no method to access arbitrary sections of the game config file, so a
 pure-SourcePawn implementation would force developers to either:
 
-* Load and parse the config separate from `LoadGameConfigFile` with an `SMCParser` or similar,
-or
+* Load and parse the config separate from `LoadGameConfigFile` with an `SMCParser` or similar.
+I've written this myself as a standalone include file, and there's still a decent amount of
+manual management that needed doing for every plugin I wrote using it.
 * Have them place the required information in separate "Keys" section entries with particular
-naming conventions.
+naming conventions.  This is what [Memory Patcher][] and [No Thriller Taunt][] do.
+
+[Memory Patcher]: https://forums.alliedmods.net/showthread.php?p=2617543
+[No Thriller Taunt]: https://forums.alliedmods.net/showthread.php?t=171343
 
 Both solutions (which are the ones that I can think of) are fairly cumbersome.
 
@@ -33,7 +40,8 @@ that don't need further configuration other than being toggled on.
 
 ### Writing patches
 
-This assumes you have a decent enough understanding of x86 assembly.
+This assumes you have a decent enough understanding of x86 assembly.  I mean, why else would you
+be writing one?
 
 A new `MemPatches` section is added at the same level of `Addresses`, `Offsets`, and
 `Signatures` in the game configuration file.  An example of a section is below:
@@ -71,21 +79,37 @@ referencing in IDA or similar.
 supported) indicating the byte payload and a signature to match against at the previously
 mentioned offset.
 
+### Automatically applying patches
+
+Add a key / value pair to `configs/sourcescramble_manager.cfg`, where the key and value
+correspond to a gamedata file and patch name, respectively.
+
+Reload the plugin using `sm plugins reload sourcescramble_manager` to reload the patches.
+No reload command is built-in, because the plugin intentionally leaks and doesn't keep track of
+handles.
+
 ### Manually applying patches
+
+For more complex cases (e.g., scoped hook memory patches or potentially dynamic patch
+modifications), you'll have to write your own plugin.
 
 This should be fairly self-explanatory:
 
 ```sourcepawn
 // Handle hGameConf = LoadGameConfigFile(...);
 
-// patches are cleaned up when the handle is deleted (which occurs when the owning plugin is unloaded)
+// patches are cleaned up when the handle is deleted (including when the owning plugin is unloaded)
 MemoryPatch patch = MemoryPatch.CreateFromConf(hGameConf, "CTraceFilterObject::ShouldHitEntity()::patch_tfbot_building_collisions");
 
 if (!patch.Validate()) {
-	PrintToServer("[patchmem] Failed to verify patch.");
+	LogError("Failed to verify patch.");
 } else if (patch.Enable()) {
-	PrintToServer("[patchmem] Enabled patch.");
+	LogError("Enabled patch.");
 }
+
+// ...
+
+patch.Disable();
 ```
 
 ## Future additions
