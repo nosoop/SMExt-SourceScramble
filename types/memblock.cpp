@@ -34,7 +34,7 @@ HandleError ReadMemoryBlockHandle(Handle_t hndl, MemoryBlock **memoryBlock) {
 
 /* static MemoryBlock.MemoryBlock(int size); */
 cell_t sm_MemoryBlockCreate(IPluginContext *pContext, const cell_t *params) {
-	size_t size = params[2];
+	cell_t size = params[1];
 	
 	if (size <= 0) {
 		return pContext->ThrowNativeError("Cannot allocate %d bytes of memory.", size);
