@@ -31,6 +31,14 @@ methodmap MemoryPatch < Handle {
 	 * Disables a memory patch.
 	 */
 	public native void Disable();
+	
+	/**
+	 * Returns the starting address of the patch, equivalent to the address of the patch's
+	 * dependent signature plus the patch offset.
+	 */
+	property Address Address {
+		public native get();
+	}
 }
 
 public Extension __ext_sourcescramble = {

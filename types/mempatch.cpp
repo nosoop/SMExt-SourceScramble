@@ -154,3 +154,15 @@ cell_t sm_MemoryPatchDisable(IPluginContext *pContext, const cell_t *params) {
 	pMemoryPatch->Disable();
 	return true;
 }
+
+cell_t sm_MemoryPatchPropAddressGet(IPluginContext *pContext, const cell_t *params) {
+	Handle_t hndl = static_cast<Handle_t>(params[1]);
+	
+	MemoryPatch *pMemoryPatch;
+	HandleError err;
+	if ((err = ReadMemoryPatchHandle(hndl, &pMemoryPatch)) != HandleError_None) {
+		return pContext->ThrowNativeError("Invalid StringMultiMap handle %x (error %d)", hndl, err);
+	}
+	
+	return pMemoryPatch->pAddress;
+}

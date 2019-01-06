@@ -10,7 +10,7 @@
 
 #include <sourcescramble>
 
-#define PLUGIN_VERSION "1.0.0"
+#define PLUGIN_VERSION "1.1.0"
 public Plugin myinfo = {
 	name = "Source Scramble Manager",
 	author = "nosoop",
@@ -48,7 +48,8 @@ public SMCResult PatchMemConfigEntry(SMCParser smc, const char[] key, const char
 	if (!patch.Validate()) {
 		PrintToServer("[sourcescramble] Failed to verify patch \"%s\" from \"%s\"", value, key);
 	} else if (patch.Enable()) {
-		PrintToServer("[sourcescramble] Enabled patch \"%s\" from \"%s\"", value, key);
+		PrintToServer("[sourcescramble] Enabled patch \"%s\" from \"%s\" at address: 0x%08X",
+				value, key, patch.Address);
 	}
 	return SMCParse_Continue;
 }
