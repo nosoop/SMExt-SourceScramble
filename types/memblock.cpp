@@ -1,12 +1,7 @@
 #include "extension.h"
 #include "memblock.h"
 
-#include <sourcehook.h>
-#include <sh_memory.h>
-
-#include <am-vector.h>
-
-#include "userconf/mempatches.h"
+#include <cstdlib>
 
 HandleType_t g_MemoryBlockType = 0;
 
