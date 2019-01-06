@@ -36,7 +36,7 @@ The extension comes bundled with `sourcescramble_manager`, a helper plugin that 
 file names and patch names from a config file, then loads them all in.  For those simple patches
 that don't need further configuration other than being toggled on.
 
-## How to use
+## Memory patching usage
 
 ### Writing patches
 
@@ -112,8 +112,11 @@ if (!patch.Validate()) {
 patch.Disable();
 ```
 
-## Future additions
+## Memory blocks
 
-One thing I was considering was allocation of arbitrary memory blocks.  Certain patches I've
-done in the past use floating point operations that do not take immediates, so I've had to rely
-on the replacement values being present elsewhere in the binary.
+A `MemoryBlock` is a `calloc`-allocated chunk of memory that can be accessed with
+`StoreToADdress` and `LoadFromAddress` (indirectly via wrapped helper methods).
+
+Some patches I've dealt with operate on fixed locations in memory (e.g., floating point load
+operations that don't take immediate values), so with this I can point to the `MemoryBlock`
+address space and put in whatever I need.

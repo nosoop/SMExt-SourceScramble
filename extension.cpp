@@ -32,6 +32,7 @@
 #include "extension.h"
 
 #include "types/mempatch.h"
+#include "types/memblock.h"
 #include "userconf/mempatches.h"
 
 /**
@@ -44,14 +45,19 @@ MemPatchExt g_Extension;		/**< Global singleton for extension's main interface *
 SMEXT_LINK(&g_Extension);
 
 MemoryPatchHandler g_MemoryPatchHandler;
+MemoryBlockHandler g_MemoryBlockHandler;
 
 bool MemPatchExt::SDK_OnLoad(char* error, size_t maxlength, bool late) {
 	sharesys->AddNatives(myself, g_MemoryPatchNatives);
+	sharesys->AddNatives(myself, g_MemoryBlockNatives);
 	
 	gameconfs->AddUserConfigHook("MemPatches", &g_MemPatchConfig);
 	
 	g_MemoryPatchType = g_pHandleSys->CreateType("MemoryPatch",
 			&g_MemoryPatchHandler, 0, NULL, NULL, myself->GetIdentity(), NULL);
+	
+	g_MemoryBlockType = g_pHandleSys->CreateType("MemoryBlock",
+			&g_MemoryBlockHandler, 0, NULL, NULL, myself->GetIdentity(), NULL);
 	
 	return true;
 }
@@ -59,4 +65,5 @@ bool MemPatchExt::SDK_OnLoad(char* error, size_t maxlength, bool late) {
 void MemPatchExt::SDK_OnUnload() {
 	gameconfs->RemoveUserConfigHook("MemPatches", &g_MemPatchConfig);
 	g_pHandleSys->RemoveType(g_MemoryPatchType, myself->GetIdentity());
+	g_pHandleSys->RemoveType(g_MemoryBlockType, myself->GetIdentity());
 }

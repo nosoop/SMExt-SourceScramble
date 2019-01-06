@@ -41,6 +41,62 @@ methodmap MemoryPatch < Handle {
 	}
 }
 
+methodmap MemoryBlock < Handle {
+	/**
+	 * Allocates a fixed amount of memory, initializing the contents to zero.
+	 * Size is in bytes.
+	 */
+	public native MemoryBlock(int size);
+	
+	/**
+	 * Returns the address of the allocated memory block.
+	 */
+	property Address Address {
+		public native get();
+	}
+	
+	/**
+	 * Returns the size of the allocated memory block.
+	 */
+	property int Size {
+		public native get();
+	}
+	
+	/**
+	 * Load up to 4 bytes from an offset to the memory block, performing bounds checks to ensure
+	 * reads are contained within the block.
+	 */
+	public int LoadFromOffset(int offset, NumberType size) {
+		if (offset < 0 || offset + GetNumberTypeByteSize(size) > this.Size) {
+			ThrowError("Cannot perform MemoryBlock access of %d bytes at offset %d (limit %d)",
+					GetNumberTypeByteSize(size), offset, this.Size);
+		}
+		return LoadFromAddress(this.Address + view_as<Address>(offset), size);
+	}
+	
+	/**
+	 * Store up to 4 bytes to an offset to the memory block, performing bounds checks to ensure
+	 * writes are contained within the block.
+	 */
+	public void StoreToOffset(int offset, int data, NumberType size) {
+		if (offset < 0 || offset + GetNumberTypeByteSize(size) > this.Size) {
+			ThrowError("Cannot perform MemoryBlock access of %d bytes at offset %d (limit %d)",
+					GetNumberTypeByteSize(size), offset, this.Size);
+		}
+		StoreToAddress(this.Address + view_as<Address>(offset), data, size);
+	}
+}
+
+static stock int GetNumberTypeByteSize(NumberType size) {
+	switch (size) {
+		case NumberType_Int8: return 1;
+		case NumberType_Int16: return 2;
+		case NumberType_Int32: return 4;
+	}
+	ThrowError("Unknown NumberType %d.  Did the SourceMod developers add some new ones?", size);
+	return 1;
+}
+
 public Extension __ext_sourcescramble = {
 	name = "Source Scramble",
 	file = "sourcescramble.ext",
