@@ -124,7 +124,7 @@ cell_t sm_MemoryPatchValidate(IPluginContext *pContext, const cell_t *params) {
 	MemoryPatch *pMemoryPatch;
 	HandleError err;
 	if ((err = ReadMemoryPatchHandle(hndl, &pMemoryPatch)) != HandleError_None) {
-		return pContext->ThrowNativeError("Invalid StringMultiMap handle %x (error %d)", hndl, err);
+		return pContext->ThrowNativeError("Invalid MemoryPatch handle %x (error %d)", hndl, err);
 	}
 	
 	return pMemoryPatch->Verify();
@@ -136,7 +136,7 @@ cell_t sm_MemoryPatchEnable(IPluginContext *pContext, const cell_t *params) {
 	MemoryPatch *pMemoryPatch;
 	HandleError err;
 	if ((err = ReadMemoryPatchHandle(hndl, &pMemoryPatch)) != HandleError_None) {
-		return pContext->ThrowNativeError("Invalid StringMultiMap handle %x (error %d)", hndl, err);
+		return pContext->ThrowNativeError("Invalid MemoryPatch handle %x (error %d)", hndl, err);
 	}
 	
 	return pMemoryPatch->Enable();
@@ -148,7 +148,7 @@ cell_t sm_MemoryPatchDisable(IPluginContext *pContext, const cell_t *params) {
 	MemoryPatch *pMemoryPatch;
 	HandleError err;
 	if ((err = ReadMemoryPatchHandle(hndl, &pMemoryPatch)) != HandleError_None) {
-		return pContext->ThrowNativeError("Invalid StringMultiMap handle %x (error %d)", hndl, err);
+		return pContext->ThrowNativeError("Invalid MemoryPatch handle %x (error %d)", hndl, err);
 	}
 	
 	pMemoryPatch->Disable();
@@ -161,7 +161,7 @@ cell_t sm_MemoryPatchPropAddressGet(IPluginContext *pContext, const cell_t *para
 	MemoryPatch *pMemoryPatch;
 	HandleError err;
 	if ((err = ReadMemoryPatchHandle(hndl, &pMemoryPatch)) != HandleError_None) {
-		return pContext->ThrowNativeError("Invalid StringMultiMap handle %x (error %d)", hndl, err);
+		return pContext->ThrowNativeError("Invalid MemoryPatch handle %x (error %d)", hndl, err);
 	}
 	
 	return pMemoryPatch->pAddress;

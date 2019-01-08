@@ -40,7 +40,7 @@
 /* Basic information exposed publicly */
 #define SMEXT_CONF_NAME			"Source Scramble"
 #define SMEXT_CONF_DESCRIPTION	"Convenience functions to perform memory patching."
-#define SMEXT_CONF_VERSION		"0.3.2"
+#define SMEXT_CONF_VERSION		"0.3.3"
 #define SMEXT_CONF_AUTHOR		"nosoop"
 #define SMEXT_CONF_URL			"https://github.com/nosoop/SMExt-SourceScramble"
 #define SMEXT_CONF_LOGTAG		"sscramble"
