@@ -39,7 +39,7 @@ methodmap MemoryPatch < Handle {
 	property Address Address {
 		public native get();
 	}
-}
+};
 
 methodmap MemoryBlock < Handle {
 	/**
@@ -85,7 +85,7 @@ methodmap MemoryBlock < Handle {
 		}
 		StoreToAddress(this.Address + view_as<Address>(offset), data, size);
 	}
-}
+};
 
 static stock int GetNumberTypeByteSize(NumberType size) {
 	switch (size) {
