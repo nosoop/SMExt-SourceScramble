@@ -91,7 +91,8 @@ for end-users to install without having to edit the base config file.
 
 Reload the plugin using `sm plugins reload sourcescramble_manager` to reload the patches.
 No reload command is built-in, because the plugin intentionally leaks and doesn't keep track of
-handles.
+handles.  (The extension automatically disables patches when the handle is deleted, which
+happens when the owning plugin is unloaded or reloaded.)
 
 ### Manually applying patches
 
@@ -103,13 +104,13 @@ This should be fairly self-explanatory:
 ```sourcepawn
 // Handle hGameConf = LoadGameConfigFile(...);
 
-// patches are cleaned up when the handle is deleted (including when the owning plugin is unloaded)
+// as mentioned, patches are cleaned up when the handle is deleted
 MemoryPatch patch = MemoryPatch.CreateFromConf(hGameConf, "CTraceFilterObject::ShouldHitEntity()::TFBotCollideWithBuildings");
 
 if (!patch.Validate()) {
-	LogError("Failed to verify patch.");
+	ThrowError("Failed to verify patch.");
 } else if (patch.Enable()) {
-	LogError("Enabled patch.");
+	LogMessage("Enabled patch.");
 }
 
 // ...
