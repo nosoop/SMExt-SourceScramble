@@ -34,6 +34,32 @@ ByteVector ByteVectorFromString(const char* s) {
 }
 
 /**
+ * Return true if the name is for the current operating system.
+ */
+static inline bool IsTargetPlatformSection(const char* name) {
+#if defined WIN32
+	return !strcmp(name, "windows");
+#elif defined _LINUX
+	return !strcmp(name, "linux");
+#elif defined _OSX
+	return !strcmp(name, "mac");
+#endif
+}
+
+/**
+ * Return true if the name is for an operating system but not the current one.
+ */
+static inline bool IsNonTargetPlatformSection(const char* name) {
+#if defined WIN32
+	return (!strcmp(name, "linux") || !strcmp(name, "mac"));
+#elif defined _LINUX
+	return (!strcmp(name, "windows") || !strcmp(name, "mac"));
+#elif defined _OSX
+	return (!strcmp(name, "windows") || !strcmp(name, "linux"));
+#endif
+}
+
+/**
  * Game config "Functions" section parsing.
  */
 SMCResult MemPatchGameConfig::ReadSMC_NewSection(const SMCStates *states, const char *name) {
@@ -44,14 +70,7 @@ SMCResult MemPatchGameConfig::ReadSMC_NewSection(const SMCStates *states, const 
 	}
 
 	// Handle platform specific sections first.
-#if defined WIN32
-	if (!strcmp(name, "windows"))
-#elif defined _LINUX
-	if (!strcmp(name, "linux"))
-#elif defined _OSX
-	if (!strcmp(name, "mac"))
-#endif
-	{
+	if (IsTargetPlatformSection(name)) {
 		if (g_IgnoreLevel > 0) {
 			smutils->LogError(myself, "Unreachable platform specific section in \"%s\" Function: line: %i col: %i", g_CurrentPatchInfo->signature.chars(), states->line, states->col);
 			return SMCResult_HaltFail;
@@ -64,15 +83,7 @@ SMCResult MemPatchGameConfig::ReadSMC_NewSection(const SMCStates *states, const 
 		}
 		g_PlatformOnlyState = g_ParseState;
 		return SMCResult_Continue;
-	}
-#if defined WIN32
-	else if (!strcmp(name, "linux") || !strcmp(name, "mac"))
-#elif defined _LINUX
-	else if (!strcmp(name, "windows") || !strcmp(name, "mac"))
-#elif defined _OSX
-	else if (!strcmp(name, "windows") || !strcmp(name, "linux"))
-#endif
-	{
+	} else if (IsNonTargetPlatformSection(name)) {
 		if (g_PlatformOnlyState != PState_None) {
 			smutils->LogError(myself, "Unreachable platform specific section in \"%s\" Function: line: %i col: %i", g_CurrentPatchInfo->signature.chars(), states->line, states->col);
 			return SMCResult_HaltFail;
