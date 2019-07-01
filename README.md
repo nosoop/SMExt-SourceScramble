@@ -84,6 +84,9 @@ mentioned offset.
 Add a key / value pair to `configs/sourcescramble_manager.cfg`, where the key and value
 correspond to a gamedata file and patch name, respectively.
 
+Alternatively, you can add your own config files to `configs/sourcescramble/`, making it easy
+for end-users to install without having to edit the base config file.
+
 Reload the plugin using `sm plugins reload sourcescramble_manager` to reload the patches.
 No reload command is built-in, because the plugin intentionally leaks and doesn't keep track of
 handles.
@@ -115,7 +118,7 @@ patch.Disable();
 ## Memory blocks
 
 A `MemoryBlock` is a `calloc`-allocated chunk of memory that can be accessed with
-`StoreToADdress` and `LoadFromAddress` (indirectly via wrapped helper methods).
+`StoreToAddress` and `LoadFromAddress` (indirectly via wrapped helper methods).
 
 Some patches I've dealt with operate on fixed locations in memory (e.g., floating point load
 operations that don't take immediate values), so with this I can point to the `MemoryBlock`
