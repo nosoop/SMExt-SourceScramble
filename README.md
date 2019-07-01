@@ -49,7 +49,8 @@ A new `MemPatches` section is added at the same level of `Addresses`, `Offsets`,
 ```
 "MemPatches"
 {
-	"CTraceFilterObject::ShouldHitEntity()::patch_tfbot_building_collisions"
+	// this patch makes buildings solid to TFBots
+	"CTraceFilterObject::ShouldHitEntity()::TFBotCollideWithBuildings"
 	{
 		"signature" "CTraceFilterObject::ShouldHitEntity()"
 		"linux"
@@ -70,7 +71,8 @@ A new `MemPatches` section is added at the same level of `Addresses`, `Offsets`,
 
 A few things are present:
 
-* A subsection.  The name of the section will be the name used when referencing the patch.
+* A subsection.  The name of the section will be the name used when getting a `MemoryPatch`
+handle with `MemoryPatch.CreateFromConf()`.
 * A function `signature` name referencing the name of a signature in a `Signatures` section
 somewhere else in the game config file.
 * The `offset` to patch.  Hexadecimal notation is supported with the `h` suffix, for easy
@@ -102,7 +104,7 @@ This should be fairly self-explanatory:
 // Handle hGameConf = LoadGameConfigFile(...);
 
 // patches are cleaned up when the handle is deleted (including when the owning plugin is unloaded)
-MemoryPatch patch = MemoryPatch.CreateFromConf(hGameConf, "CTraceFilterObject::ShouldHitEntity()::patch_tfbot_building_collisions");
+MemoryPatch patch = MemoryPatch.CreateFromConf(hGameConf, "CTraceFilterObject::ShouldHitEntity()::TFBotCollideWithBuildings");
 
 if (!patch.Validate()) {
 	LogError("Failed to verify patch.");
