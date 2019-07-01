@@ -10,7 +10,7 @@
 
 #include <sourcescramble>
 
-#define PLUGIN_VERSION "1.1.0"
+#define PLUGIN_VERSION "1.2.0"
 public Plugin myinfo = {
 	name = "Source Scramble Manager",
 	author = "nosoop",
@@ -28,6 +28,23 @@ public void OnPluginStart() {
 	BuildPath(Path_SM, configFile, sizeof(configFile), "configs/sourcescramble_manager.cfg");
 	
 	parser.ParseFile(configFile);
+	
+	char configDirectory[PLATFORM_MAX_PATH];
+	BuildPath(Path_SM, configDirectory, sizeof(configDirectory), "configs/sourcescramble");
+	
+	if (DirExists(configDirectory)) {
+		char fileEntry[PLATFORM_MAX_PATH];
+		DirectoryListing configFiles = OpenDirectory(configDirectory);
+		FileType dirEntryType;
+		while (configFiles.GetNext(fileEntry, sizeof(fileEntry), dirEntryType)) {
+			if (dirEntryType != FileType_File) {
+				continue;
+			}
+			
+			Format(configFile, sizeof(configFile), "%s/%s", configDirectory, fileEntry);
+			parser.ParseFile(configFile);
+		}
+	}
 	
 	delete parser;
 }
