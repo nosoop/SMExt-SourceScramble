@@ -33,7 +33,7 @@ public:
 	};
 	
 public:
-	MemoryPatchInfo* GetInfo(const char *key);
+	const MemoryPatchInfo* GetInfo(const char *key);
 	
 private:
 	StringHashMap<MemoryPatchInfo*> m_MemPatchInfoMap;

@@ -182,7 +182,7 @@ void MemPatchGameConfig::ReadSMC_ParseStart() {
 	g_PlatformOnlyState = PState_None;
 }
 
-MemPatchGameConfig::MemoryPatchInfo* MemPatchGameConfig::GetInfo(const char *key) {
+const MemPatchGameConfig::MemoryPatchInfo* MemPatchGameConfig::GetInfo(const char *key) {
 	auto sig = m_MemPatchInfoMap.find(key);
 	if (sig.found()) {
 		return sig->value;

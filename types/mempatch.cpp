@@ -97,13 +97,12 @@ cell_t sm_MemoryPatchLoadFromConfig(IPluginContext *pContext, const cell_t *para
 	char *name;
 	pContext->LocalToString(params[2], &name);
 	
-	MemPatchGameConfig::MemoryPatchInfo* pInfo = g_MemPatchConfig.GetInfo(name);
-	
+	const MemPatchGameConfig::MemoryPatchInfo* pInfo = g_MemPatchConfig.GetInfo(name);
 	if (!pInfo) {
 		return pContext->ThrowNativeError("Invalid patch name %s", name);
 	}
 	
-	const auto& info = const_cast<MemPatchGameConfig::MemoryPatchInfo&>(*pInfo);
+	const auto& info = *pInfo;
 	
 	Handle_t hndl = static_cast<Handle_t>(params[1]);
 	
