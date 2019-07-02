@@ -25,10 +25,14 @@ void ByteVectorWrite(ByteVector &vec, uint8_t* mem) {
 
 class MemoryPatch {
 public:
-	MemoryPatch(uintptr_t pAddress, MemPatchGameConfig::MemoryPatchInfo* info) {
-		this->vecPatch.extend(info->vecPatch);
-		this->vecVerify.extend(info->vecVerify);
-		this->pAddress = pAddress + (info->offset);
+	MemoryPatch(uintptr_t pAddress, const MemPatchGameConfig::MemoryPatchInfo& info) {
+		for (auto bit : info.vecPatch) {
+			this->vecPatch.append(bit);
+		}
+		for (auto bit : info.vecVerify) {
+			this->vecVerify.append(bit);
+		}
+		this->pAddress = pAddress + (info.offset);
 	}
 	
 	bool Enable() {
@@ -93,11 +97,13 @@ cell_t sm_MemoryPatchLoadFromConfig(IPluginContext *pContext, const cell_t *para
 	char *name;
 	pContext->LocalToString(params[2], &name);
 	
-	MemPatchGameConfig::MemoryPatchInfo* info = g_MemPatchConfig.GetInfo(name);
+	MemPatchGameConfig::MemoryPatchInfo* pInfo = g_MemPatchConfig.GetInfo(name);
 	
-	if (!info) {
+	if (!pInfo) {
 		return pContext->ThrowNativeError("Invalid patch name %s", name);
 	}
+	
+	const auto& info = const_cast<MemPatchGameConfig::MemoryPatchInfo&>(*pInfo);
 	
 	Handle_t hndl = static_cast<Handle_t>(params[1]);
 	
@@ -108,8 +114,8 @@ cell_t sm_MemoryPatchLoadFromConfig(IPluginContext *pContext, const cell_t *para
 	}
 	
 	void* addr;
-	if (!pConfig->GetMemSig(info->signature.chars(), &addr)) {
-		return pContext->ThrowNativeError("Failed to locate signature for '%s' (mempatch '%s')", info->signature.chars(), name);
+	if (!pConfig->GetMemSig(info.signature.chars(), &addr)) {
+		return pContext->ThrowNativeError("Failed to locate signature for '%s' (mempatch '%s')", info.signature.chars(), name);
 	}
 	
 	MemoryPatch *pMemoryPatch = new MemoryPatch((uintptr_t) addr, info);
