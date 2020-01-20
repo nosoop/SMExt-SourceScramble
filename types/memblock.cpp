@@ -25,10 +25,7 @@ void MemoryBlockHandler::OnHandleDestroy(HandleType_t type, void* object) {
 }
 
 HandleError ReadMemoryBlockHandle(Handle_t hndl, MemoryBlock **memoryBlock) {
-	HandleSecurity sec;
-	sec.pOwner = NULL;
-	sec.pIdentity = myself->GetIdentity();
-	
+	HandleSecurity sec(NULL, myself->GetIdentity());
 	return g_pHandleSys->ReadHandle(hndl, g_MemoryBlockType, &sec, (void **) memoryBlock);
 }
 

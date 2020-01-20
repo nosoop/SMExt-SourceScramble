@@ -84,10 +84,7 @@ void MemoryPatchHandler::OnHandleDestroy(HandleType_t type, void* object) {
 }
 
 HandleError ReadMemoryPatchHandle(Handle_t hndl, MemoryPatch **memoryPatch) {
-	HandleSecurity sec;
-	sec.pOwner = NULL;
-	sec.pIdentity = myself->GetIdentity();
-	
+	HandleSecurity sec(NULL, myself->GetIdentity());
 	return g_pHandleSys->ReadHandle(hndl, g_MemoryPatchType, &sec, (void **) memoryPatch);
 }
 
