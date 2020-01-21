@@ -5,18 +5,19 @@
 
 HandleType_t g_MemoryBlockType = 0;
 
-class MemoryBlock {
-public:
-	MemoryBlock(size_t size) {
+struct MemoryBlock {
+	MemoryBlock(size_t size) : size{size}, disowned{false} {
 		this->block = calloc(size, 1);
-		this->size = size;
 	}
 	
 	~MemoryBlock() {
-		free(this->block);
+		if (!disowned) {
+			free(this->block);
+		}
 	}
 	
 	size_t size;
+	bool disowned;
 	void* block;
 };
 
@@ -61,7 +62,7 @@ cell_t sm_MemoryBlockPropAddressGet(IPluginContext *pContext, const cell_t *para
 		return pContext->ThrowNativeError("Invalid MemoryBlock handle %x (error %d)", hndl, err);
 	}
 	
-	return (uint32_t) pMemoryBlock->block;
+	return (uintptr_t) pMemoryBlock->block;
 }
 
 cell_t sm_MemoryBlockPropSizeGet(IPluginContext *pContext, const cell_t *params) {
@@ -74,4 +75,17 @@ cell_t sm_MemoryBlockPropSizeGet(IPluginContext *pContext, const cell_t *params)
 	}
 	
 	return pMemoryBlock->size;
+}
+
+cell_t sm_MemoryBlockDisown(IPluginContext *pContext, const cell_t *params) {
+	Handle_t hndl = static_cast<Handle_t>(params[1]);
+	
+	MemoryBlock *pMemoryBlock;
+	HandleError err;
+	if ((err = ReadMemoryBlockHandle(hndl, &pMemoryBlock)) != HandleError_None) {
+		return pContext->ThrowNativeError("Invalid MemoryBlock handle %x (error %d)", hndl, err);
+	}
+	
+	pMemoryBlock->disowned = true;
+	return 0;
 }
