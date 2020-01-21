@@ -1,7 +1,9 @@
 # Source Scramble
 
-A SourceMod extension that provides convenient methods to access platform-specific memory
-patches stored in game configuration files.
+A SourceMod extension that provides:
+- An easy way for plugins to validate and patch platform-specific address locations with a game
+configuration file.
+- A new handle type for plugins to allocate / free their own memory blocks.
 
 ## Origin
 
@@ -126,3 +128,17 @@ A `MemoryBlock` is a `calloc`-allocated chunk of memory that can be accessed wit
 Some patches I've dealt with operate on fixed locations in memory (e.g., floating point load
 operations that don't take immediate values), so with this I can point to the `MemoryBlock`
 address space and put in whatever I need.
+
+Basic use of the API:
+
+```sourcepawn
+// allocate and zero-initializes 4 bytes of memory
+MemoryBlock block = new MemoryBlock(4);
+
+block.StoreToOffset(0, view_as<int>(0.75), NumberType_Int32);
+
+Address pFloatBlock = block.Address;
+
+// frees the 4 bytes that was allocated
+delete block;
+```
