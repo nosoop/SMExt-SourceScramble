@@ -7,6 +7,7 @@
 #include "extension.h"
 
 #include <am-string.h>
+#include <am-vector.h>
 #include <sm_stringhashmap.h>
 
 using ByteVector = ke::Vector<uint8_t>;
