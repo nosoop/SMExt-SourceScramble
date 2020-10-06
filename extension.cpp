@@ -34,6 +34,7 @@
 #include "types/mempatch.h"
 #include "types/memblock.h"
 #include "userconf/mempatches.h"
+#include "native_utils.h"
 
 /**
  * @file extension.cpp
@@ -50,6 +51,7 @@ MemoryBlockHandler g_MemoryBlockHandler;
 bool MemPatchExt::SDK_OnLoad(char* error, size_t maxlength, bool late) {
 	sharesys->AddNatives(myself, g_MemoryPatchNatives);
 	sharesys->AddNatives(myself, g_MemoryBlockNatives);
+	sharesys->AddNatives(myself, g_UtilNatives);
 	
 	gameconfs->AddUserConfigHook("MemPatches", &g_MemPatchConfig);
 	

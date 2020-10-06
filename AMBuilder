@@ -6,6 +6,7 @@ projectName = 'sourcescramble'
 # smsdk_ext.cpp will be automatically added later
 sourceFiles = [
   'extension.cpp',
+  'native_utils.cpp',
   'types/mempatch.cpp',
   'types/memblock.cpp',
   'userconf/mempatches.cpp'

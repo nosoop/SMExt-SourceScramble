@@ -106,6 +106,16 @@ static stock int GetNumberTypeByteSize(NumberType size) {
 	return 1; // maybe `return (1 << size);` ?
 }
 
+/**
+ * Returns the physical memory address of a given SourcePawn cell reference.
+ */
+native Address GetAddressOfCell(any& cell);
+
+/**
+ * Returns the physical memory address of a given string.
+ */
+native Address GetAddressOfString(char[] array);
+
 public Extension __ext_sourcescramble = {
 	name = "Source Scramble",
 	file = "sourcescramble.ext",
