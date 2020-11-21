@@ -25,6 +25,11 @@ void MemoryBlockHandler::OnHandleDestroy(HandleType_t type, void* object) {
 	delete (MemoryBlock*) object;
 }
 
+bool MemoryBlockHandler::GetHandleApproxSize(HandleType_t type, void* object, unsigned int* size) {
+	*size = ((MemoryBlock*)object)->size;
+	return true;
+}
+
 HandleError ReadMemoryBlockHandle(Handle_t hndl, MemoryBlock **memoryBlock) {
 	HandleSecurity sec(NULL, myself->GetIdentity());
 	return g_pHandleSys->ReadHandle(hndl, g_MemoryBlockType, &sec, (void **) memoryBlock);
