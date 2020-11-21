@@ -3,6 +3,7 @@
 class MemoryBlockHandler : public IHandleTypeDispatch {
 	public:
 	void OnHandleDestroy(HandleType_t type, void* object);
+	bool GetHandleApproxSize(HandleType_t type, void* object, unsigned int* size);
 };
 
 extern HandleType_t g_MemoryBlockType;
