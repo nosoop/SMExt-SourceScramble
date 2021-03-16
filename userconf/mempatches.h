@@ -10,7 +10,7 @@
 #include <am-vector.h>
 #include <sm_stringhashmap.h>
 
-using ByteVector = ke::Vector<uint8_t>;
+using ByteVector = std::vector<uint8_t>;
 
 class MemPatchGameConfig : public ITextListener_SMC {
 public:
@@ -22,7 +22,7 @@ public:
 public:
 	class MemoryPatchInfo {
 	public:
-		ke::AString signature;
+		std::string signature;
 		size_t offset;
 		ByteVector vecPatch, vecVerify;
 	};
