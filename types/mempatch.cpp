@@ -32,6 +32,9 @@ public:
 		for (auto bit : info.vecVerify) {
 			this->vecVerify.append(bit);
 		}
+		for (auto bit : info.vecPreserve) {
+			this->vecPreserve.append(bit);
+		}
 		this->pAddress = pAddress + (info.offset);
 	}
 	
@@ -49,6 +52,16 @@ public:
 		SourceHook::SetMemAccess((void*) this->pAddress, vecPatch.length() * sizeof(uint8_t),
 				SH_MEM_READ | SH_MEM_WRITE | SH_MEM_EXEC);
 		ByteVectorWrite(vecPatch, (uint8_t*) pAddress);
+		
+		// 
+		for (size_t i = 0; i < vecPatch.length(); i++) {
+			uint8_t preserveBits = 0;
+			if (i < vecPreserve.length()) {
+				preserveBits = vecPreserve[i];
+			}
+			*((uint8_t*) pAddress + i) = (vecPatch[i] & ~preserveBits) | (vecRestore[i] & preserveBits);
+		}
+		
 		return true;
 	}
 	
@@ -76,7 +89,7 @@ public:
 	}
 	
 	uintptr_t pAddress;
-	ByteVector vecPatch, vecRestore, vecVerify;
+	ByteVector vecPatch, vecRestore, vecVerify, vecPreserve;
 };
 
 void MemoryPatchHandler::OnHandleDestroy(HandleType_t type, void* object) {

@@ -139,6 +139,8 @@ SMCResult MemPatchGameConfig::ReadSMC_KeyValue(const SMCStates *states, const ch
 			g_CurrentPatchInfo->vecPatch = ByteVectorFromString(value);
 		} else if (!strcmp(key, "verify")) {
 			g_CurrentPatchInfo->vecVerify = ByteVectorFromString(value);
+		} else if (!strcmp(key, "preserve")) {
+			g_CurrentPatchInfo->vecPreserve = ByteVectorFromString(value);
 		}
 		break;
 	default:

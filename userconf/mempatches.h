@@ -24,7 +24,7 @@ public:
 	public:
 		ke::AString signature;
 		size_t offset;
-		ByteVector vecPatch, vecVerify;
+		ByteVector vecPatch, vecVerify, vecPreserve;
 	};
 	
 	enum ParseState {
