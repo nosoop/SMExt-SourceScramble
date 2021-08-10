@@ -1,5 +1,7 @@
 # Source Scramble
 
+[:coffee: fund my caffeine addiction :coffee:](https://buymeacoff.ee/nosoop)
+
 A SourceMod extension that provides:
 - An easy way for plugins to validate and patch platform-specific address locations with a game
 configuration file.
