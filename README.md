@@ -112,6 +112,10 @@ referencing in IDA or similar.
 supported) indicating the byte payload and a signature to match against at the previously
 mentioned offset.
 	- `verify` signatures can use `\x2A` to indicate wildcards, same as SourceMod.
+- An optional `preserve` hex string indicating which bits from the original location should be
+copied to the patch.  (New in 0.7.x.)
+	- For example, if you want to copy the high 4 bits in a byte from the original memory,
+	that would be represented in binary as `0b11110000`, and you would use `\xF0`.
 
 Any values written on top of an applied patch will be reverted back when the patch is removed.
 
