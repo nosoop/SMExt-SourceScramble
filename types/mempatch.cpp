@@ -35,7 +35,9 @@ public:
 		for (auto bit : info.vecPreserve) {
 			this->vecPreserve.append(bit);
 		}
-		this->pAddress = pAddress + (info.offset);
+		
+		// ignore offset if address is bad
+		this->pAddress = pAddress ? pAddress + (info.offset) : 0;
 	}
 	
 	bool Enable() {
@@ -75,6 +77,10 @@ public:
 	}
 	
 	bool Verify() {
+		if (!pAddress) {
+			return false;
+		}
+		
 		auto addr = (uint8_t*) pAddress;
 		for (size_t i = 0; i < this->vecVerify.length(); i++) {
 			if (vecVerify[i] != '*' && vecVerify[i] != addr[i]) {
