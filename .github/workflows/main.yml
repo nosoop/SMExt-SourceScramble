@@ -27,6 +27,7 @@ jobs:
         sm_version:
           - "1.9"
           - "1.10"
+          - "1.11"
           - "latest"
           
         include:
@@ -44,7 +45,10 @@ jobs:
             
           - sm_version: "1.10"
             sm_branch: "1.10-dev"
-            
+
+          - sm_version: "1.11"
+            sm_branch: "1.11-dev"
+
           - os: ubuntu-latest
             os_short: linux
             
