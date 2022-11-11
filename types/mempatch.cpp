@@ -4,7 +4,7 @@
 #include <sourcehook.h>
 #include <sh_memory.h>
 
-#include <am-vector.h>
+#include <vector>
 
 #include "userconf/mempatches.h"
 

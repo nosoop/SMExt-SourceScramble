@@ -6,8 +6,9 @@
 
 #include "extension.h"
 
-#include <am-string.h>
-#include <am-vector.h>
+#include <string>
+#include <vector>
+
 #include <sm_stringhashmap.h>
 
 using ByteVector = std::vector<uint8_t>;
