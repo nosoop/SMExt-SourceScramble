@@ -13,12 +13,12 @@ HandleType_t g_MemoryPatchType = 0;
 void ByteVectorRead(ByteVector &vec, uint8_t* mem, size_t count) {
 	vec.clear();
 	for (size_t i = 0; i < count; i++) {
-		vec.append(mem[i]);
+		vec.emplace_back(mem[i]);
 	}
 }
 
 void ByteVectorWrite(ByteVector &vec, uint8_t* mem) {
-	for (size_t i = 0; i < vec.length(); i++) {
+	for (size_t i = 0; i < vec.size(); i++) {
 		mem[i] = vec[i];
 	}
 }
@@ -27,13 +27,13 @@ class MemoryPatch {
 public:
 	MemoryPatch(uintptr_t pAddress, const MemPatchGameConfig::MemoryPatchInfo& info) {
 		for (auto bit : info.vecPatch) {
-			this->vecPatch.append(bit);
+			this->vecPatch.emplace_back(bit);
 		}
 		for (auto bit : info.vecVerify) {
-			this->vecVerify.append(bit);
+			this->vecVerify.emplace_back(bit);
 		}
 		for (auto bit : info.vecPreserve) {
-			this->vecPreserve.append(bit);
+			this->vecPreserve.emplace_back(bit);
 		}
 		
 		// ignore offset if address is bad
@@ -41,7 +41,7 @@ public:
 	}
 	
 	bool Enable() {
-		if (vecRestore.length() > 0) {
+		if (vecRestore.size() > 0) {
 			// already patched, disregard
 			return false;
 		}
@@ -49,16 +49,16 @@ public:
 		if (!this->Verify()) {
 			return false;
 		}
-		ByteVectorRead(vecRestore, (uint8_t*) pAddress, vecPatch.length());
+		ByteVectorRead(vecRestore, (uint8_t*) pAddress, vecPatch.size());
 		
-		SourceHook::SetMemAccess((void*) this->pAddress, vecPatch.length() * sizeof(uint8_t),
+		SourceHook::SetMemAccess((void*) this->pAddress, vecPatch.size() * sizeof(uint8_t),
 				SH_MEM_READ | SH_MEM_WRITE | SH_MEM_EXEC);
 		ByteVectorWrite(vecPatch, (uint8_t*) pAddress);
 		
 		// 
-		for (size_t i = 0; i < vecPatch.length(); i++) {
+		for (size_t i = 0; i < vecPatch.size(); i++) {
 			uint8_t preserveBits = 0;
-			if (i < vecPreserve.length()) {
+			if (i < vecPreserve.size()) {
 				preserveBits = vecPreserve[i];
 			}
 			*((uint8_t*) pAddress + i) = (vecPatch[i] & ~preserveBits) | (vecRestore[i] & preserveBits);
@@ -68,7 +68,7 @@ public:
 	}
 	
 	void Disable() {
-		if (vecRestore.length() == 0) {
+		if (vecRestore.size() == 0) {
 			// no memory to restore, fug
 			return;
 		}
@@ -82,7 +82,7 @@ public:
 		}
 		
 		auto addr = (uint8_t*) pAddress;
-		for (size_t i = 0; i < this->vecVerify.length(); i++) {
+		for (size_t i = 0; i < this->vecVerify.size(); i++) {
 			if (vecVerify[i] != '*' && vecVerify[i] != addr[i]) {
 				return false;
 			}
@@ -129,8 +129,8 @@ cell_t sm_MemoryPatchLoadFromConfig(IPluginContext *pContext, const cell_t *para
 	}
 	
 	void* addr;
-	if (!pConfig->GetMemSig(info.signature.chars(), &addr)) {
-		return pContext->ThrowNativeError("Failed to locate signature for '%s' (mempatch '%s')", info.signature.chars(), name);
+	if (!pConfig->GetMemSig(info.signature.c_str(), &addr)) {
+		return pContext->ThrowNativeError("Failed to locate signature for '%s' (mempatch '%s')", info.signature.c_str(), name);
 	}
 	
 	MemoryPatch *pMemoryPatch = new MemoryPatch((uintptr_t) addr, info);
