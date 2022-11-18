@@ -39,19 +39,19 @@ jobs:
             sm_branch: master
             meta_version: latest
             meta_branch: master
-            
+          
           - sm_version: "1.9"
             sm_branch: "1.9-dev"
-            
+          
           - sm_version: "1.10"
             sm_branch: "1.10-dev"
-
+          
           - sm_version: "1.11"
             sm_branch: "1.11-dev"
-
+          
           - os: ubuntu-latest
             os_short: linux
-            
+          
           - os: windows-latest
             os_short: win
             
@@ -148,5 +148,5 @@ jobs:
       - name: Uploading package
         uses: actions/upload-artifact@v3
         with:
-          name: SMExt-SourceScramble-sm${{ matrix.sm_version }}-${{ matrix.os_short }}-${{ env.GITHUB_SHA_SHORT }}
+          name: ${{ github.event.repository.name }}-sm${{ matrix.sm_version }}-${{ matrix.os_short }}-${{ env.GITHUB_SHA_SHORT }}
           path: src/build/package
