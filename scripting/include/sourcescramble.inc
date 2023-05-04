@@ -49,6 +49,16 @@ methodmap MemoryBlock < Handle {
 	public native MemoryBlock(int size);
 	
 	/**
+	 * Creates a MemoryBlock 'view' from the given location and size (in bytes).  This will
+	 * assign the MemoryBlock.Address and MemoryBlock.Size properties, and the MemoryBlock will
+	 * be treated as if Disown was called on it; it will not be freed when the handle is closed.
+	 * 
+	 * @param address    Starting location of memory block.
+	 * @param size       Size of memory block, in bytes.
+	 */
+	public static native MemoryBlock FromAddress(Address address, int size);
+	
+	/**
 	 * Disowns the associated memory block, allowing it to remain allocated even when the handle
 	 * is deleted.  Disowning the memory does not invalidate the handle.
 	 * 
@@ -56,6 +66,14 @@ methodmap MemoryBlock < Handle {
 	 * block.
 	 */
 	public native void Disown();
+	
+	/**
+	 * Reallocates the memory specified in the MemoryBlock.  This will invalidate any
+	 * MemoryBlock.Address values previously retrieved from the handle.
+	 * 
+	 * @param size    Size of allocated block, in bytes.
+	 */
+	public native void Reallocate(int size);
 	
 	/**
 	 * Returns the address of the allocated memory block.

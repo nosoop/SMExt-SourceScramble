@@ -13,6 +13,9 @@ cell_t sm_MemoryBlockCreate(IPluginContext *pContext, const cell_t *params);
 cell_t sm_MemoryBlockPropAddressGet(IPluginContext *pContext, const cell_t *params);
 cell_t sm_MemoryBlockPropSizeGet(IPluginContext *pContext, const cell_t *params);
 cell_t sm_MemoryBlockDisown(IPluginContext *pContext, const cell_t *params);
+cell_t sm_MemoryBlockReallocate(IPluginContext *pContext, const cell_t *params);
+
+cell_t sm_MemoryBlockFromAddress(IPluginContext *pContext, const cell_t *params);
 
 const sp_nativeinfo_t g_MemoryBlockNatives[] = {
 	{ "MemoryBlock.MemoryBlock", sm_MemoryBlockCreate },
@@ -20,6 +23,9 @@ const sp_nativeinfo_t g_MemoryBlockNatives[] = {
 	{ "MemoryBlock.Address.get", sm_MemoryBlockPropAddressGet },
 	{ "MemoryBlock.Size.get", sm_MemoryBlockPropSizeGet },
 	{ "MemoryBlock.Disown", sm_MemoryBlockDisown },
+	{ "MemoryBlock.Reallocate", sm_MemoryBlockReallocate },
+	
+	{ "MemoryBlock.FromAddress", sm_MemoryBlockFromAddress },
 	
 	{NULL, NULL},
 };

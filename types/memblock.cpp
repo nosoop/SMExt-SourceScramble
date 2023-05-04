@@ -10,6 +10,14 @@ struct MemoryBlock {
 		this->block = calloc(size, 1);
 	}
 	
+	MemoryBlock(void* address, size_t size) : size{size}, disowned{true}, block{address} {
+	}
+	
+	void Reallocate(size_t size) {
+		this->block = realloc(block, size);
+		this->size = size;
+	}
+	
 	~MemoryBlock() {
 		if (!disowned) {
 			free(this->block);
@@ -67,6 +75,7 @@ cell_t sm_MemoryBlockPropAddressGet(IPluginContext *pContext, const cell_t *para
 		return pContext->ThrowNativeError("Invalid MemoryBlock handle %x (error %d)", hndl, err);
 	}
 	
+	// TODO this isn't safe for 64-bit SM
 	return (uintptr_t) pMemoryBlock->block;
 }
 
@@ -93,4 +102,32 @@ cell_t sm_MemoryBlockDisown(IPluginContext *pContext, const cell_t *params) {
 	
 	pMemoryBlock->disowned = true;
 	return 0;
+}
+
+cell_t sm_MemoryBlockReallocate(IPluginContext *pContext, const cell_t *params) {
+	Handle_t hndl = static_cast<Handle_t>(params[1]);
+	size_t size = params[2];
+	
+	MemoryBlock *pMemoryBlock;
+	HandleError err;
+	if ((err = ReadMemoryBlockHandle(hndl, &pMemoryBlock)) != HandleError_None) {
+		return pContext->ThrowNativeError("Invalid MemoryBlock handle %x (error %d)", hndl, err);
+	}
+	
+	pMemoryBlock->Reallocate(size);
+	return 0;
+}
+
+cell_t sm_MemoryBlockFromAddress(IPluginContext *pContext, const cell_t *params) {
+	cell_t address = params[1];
+	size_t size = params[2];
+	
+	if (size <= 0) {
+		return pContext->ThrowNativeError("Cannot allocate %d bytes of memory.", size);
+	}
+	
+	MemoryBlock *pMemoryBlock = new MemoryBlock((void*) address, size);
+	
+	return g_pHandleSys->CreateHandle(g_MemoryBlockType, pMemoryBlock,
+			pContext->GetIdentity(), myself->GetIdentity(), NULL);
 }
