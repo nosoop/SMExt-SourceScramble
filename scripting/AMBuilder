@@ -1,0 +1,40 @@
+# vim: set sts=2 ts=8 sw=2 tw=99 et ft=python:
+import os, sys
+
+pluginFiles = [
+  'sourcescramble_manager.sp'
+]
+
+spcomp_argv = [
+  Extension.spcomp_bin,
+  '-i' + os.path.relpath(os.path.join(builder.currentSourcePath, 'include'),
+                         os.path.join(builder.buildPath, builder.buildFolder)),
+  '-h',
+  '-E',
+]
+
+def build_plugin(script_path, smx_file):
+  inputs = [
+    Extension.spcomp_bin,
+    script_path,
+  ]
+  outputs = [
+    smx_file
+  ]
+  argv = spcomp_argv + [script_path]
+  result = builder.AddCommand(
+    inputs = inputs,
+    argv = argv,
+    outputs = outputs,
+    dep_type = 'msvc',
+  )
+
+  # ???
+  (smx_command, smx_outputs) = result
+  out, *_ = smx_outputs
+  Extension.plugins[smx_file] = out
+
+for script_file in pluginFiles:
+  script_path = os.path.join(builder.currentSourcePath, script_file)
+  smx_file = os.path.splitext(script_file)[0] + '.smx'
+  build_plugin(script_path, smx_file)

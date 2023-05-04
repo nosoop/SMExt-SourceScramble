@@ -1,5 +1,6 @@
 # vim: set sts=2 ts=8 sw=2 tw=99 et ft=python:
 import os
+import shutil
 
 def ResolveEnvPath(env, folder):
   if env in os.environ:
@@ -25,8 +26,10 @@ def Normalize(path):
 class ExtensionConfig(object):
   def __init__(self):
     self.extensions = []
+    self.plugins = {}
     self.sm_root = None
     self.mms_root = None
+    self.spcomp_bin = None
 
   @property
   def tag(self):
@@ -58,6 +61,18 @@ class ExtensionConfig(object):
         self.mms_root = ResolveEnvPath('MMSOURCE', 'metamod-source')
       if not self.mms_root:
         self.mms_root = ResolveEnvPath('MMSOURCE_DEV', 'mmsource-central')
+
+  def detectSPCompiler(self):
+    if builder.options.no_plugins:
+      return
+    spcomp_path = builder.options.spcomp_path
+    if not spcomp_path or not os.path.isdir(spcomp_path):
+      spcomp_found = shutil.which("spcomp")
+      if not spcomp_found:
+        raise Exception('Could not find a path for spcomp')
+    self.spcomp_bin = shutil.which('spcomp', path = spcomp_path)
+    if not self.spcomp_bin:
+      raise Exception('Could not find spcomp')
 
   def configure(self):
     cxx = builder.DetectCompilers()
@@ -235,12 +250,18 @@ class ExtensionConfig(object):
 Extension = ExtensionConfig()
 Extension.detectMetaMod()
 Extension.detectSourceMod()
+Extension.detectSPCompiler()
 Extension.configure()
 
 # Add additional buildscripts here
 BuildScripts = [
   'AMBuilder',
 ]
+
+if not builder.options.no_plugins:
+  BuildScripts += [
+    'scripting/AMBuilder',
+  ]
 
 if builder.backend == 'amb2':
   BuildScripts += [
