@@ -46,10 +46,8 @@ class ExtensionConfig(object):
         self.sm_root = ResolveEnvPath('SOURCEMOD', 'sourcemod')
       if not self.sm_root:
         self.sm_root = ResolveEnvPath('SOURCEMOD_DEV', 'sourcemod-central')
-
     if not self.sm_root or not os.path.isdir(self.sm_root):
       raise Exception('Could not find a source copy of SourceMod')
-
     self.sm_root = Normalize(self.sm_root)
 
   def detectMetaMod(self):
@@ -61,6 +59,9 @@ class ExtensionConfig(object):
         self.mms_root = ResolveEnvPath('MMSOURCE', 'metamod-source')
       if not self.mms_root:
         self.mms_root = ResolveEnvPath('MMSOURCE_DEV', 'mmsource-central')
+    if not self.mms_root or not os.path.isdir(self.mms_root):
+      raise Exception('Could not find a source copy of Metamod:Source')
+    self.mms_root = Normalize(self.mms_root)
 
   def detectSPCompiler(self):
     if builder.options.no_plugins:
