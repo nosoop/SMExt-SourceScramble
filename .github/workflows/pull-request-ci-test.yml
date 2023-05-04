@@ -1,0 +1,112 @@
+# Builds when a PR is opened.
+name: PR Compile Test
+
+on: pull_request
+
+jobs:
+  build:
+    name: Build for ${{ matrix.os_short }} using sm-${{ matrix.sm_branch }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-20.04
+          - windows-latest
+        include:
+          - meta_branch: "1.10-dev"
+            sm_branch: "1.10-dev"
+            spcomp_version: "1.10.x"
+
+          - os: ubuntu-20.04
+            os_short: linux
+            package_ext: tar.gz
+
+          - os: windows-latest
+            os_short: win
+            package_ext: zip
+
+    steps:
+      - name: Prepare env
+        shell: bash
+        run: |
+          echo "GITHUB_SHA_SHORT=${GITHUB_SHA::7}" >> $GITHUB_ENV
+          
+      - name: Install (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get install -y clang g++-multilib
+          echo "CC=clang" >> $GITHUB_ENV
+          echo "CXX=clang++" >> $GITHUB_ENV
+          
+      - name: Add msbuild to PATH (Windows)
+        if: runner.os == 'Windows'
+        uses: microsoft/setup-msbuild@v1.1
+        
+      - name: Install (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          :: See https://github.com/microsoft/vswhere/wiki/Find-VC
+          for /f "usebackq delims=*" %%i in (`vswhere -latest -property installationPath`) do (
+            call "%%i"\Common7\Tools\vsdevcmd.bat -arch=x86 -host_arch=x64
+          )
+          
+          :: Loop over all environment variables and make them global.
+          for /f "delims== tokens=1,2" %%a in ('set') do (
+            echo>>"%GITHUB_ENV%" %%a=%%b
+          )
+          
+
+      - name: Fetch Metamod:Source ${{ matrix.meta_branch }}
+        uses: actions/checkout@v2
+        with:
+          repository: alliedmodders/metamod-source
+          ref: ${{ matrix.meta_branch }}
+          path: mmsource
+
+      - name: Fetch SourceMod ${{ matrix.sm_branch }}
+        uses: actions/checkout@v2
+        with:
+          repository: alliedmodders/sourcemod
+          ref: ${{ matrix.sm_branch }}
+          path: sourcemod
+          submodules: recursive
+
+      - name: Checkout AMBuild
+        uses: actions/checkout@v3
+        with:
+          repository: alliedmodders/ambuild
+          path: ambuild
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Set up spcomp
+        uses: rumblefrog/setup-sp@v1.2.2
+        with:
+          version: ${{ matrix.spcomp_version }}
+          no-spcomp-proxy: true
+
+      - name: Checkout ambuild
+        run: |
+          python -m pip install wheel
+          pip install git+https://github.com/alliedmodders/ambuild
+
+      - name: Checkout project
+        uses: actions/checkout@v3
+        with:
+          path: src
+
+      - name: Build Files
+        working-directory: src
+        run: |
+          mkdir build
+          cd build
+          python3 ../configure.py --sm-path="${{ github.workspace }}/sourcemod" --mms-path="${{ github.workspace }}/mmsource" --symbol-files --enable-optimize
+          ambuild
