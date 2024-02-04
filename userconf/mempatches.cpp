@@ -106,7 +106,7 @@ SMCResult MemPatchGameConfig::ReadSMC_NewSection(const SMCStates *states, const 
 			break;
 		}
 		case PState_Runtime: {
-			smutils->LogError(myself, "Unexpected subsection \"%s\" (expected platform-specific)");
+			smutils->LogError(myself, "Unexpected subsection \"%s\" (expected platform-specific)", name);
 			break;
 		}
 		default:
