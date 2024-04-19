@@ -8,6 +8,7 @@ builder.SetBuildFolder('package')
 # Add any folders you need to this list
 folder_list = [
   'addons/sourcemod/extensions',
+  'addons/sourcemod/scripting',
   'addons/sourcemod/scripting/include',
   #'addons/sourcemod/gamedata',
   #'addons/sourcemod/configs',
@@ -51,6 +52,12 @@ CopyFiles('scripting/include', 'addons/sourcemod/scripting/include',
 #  'otherconfig.cfg,
 #  ]
 #)
+
+# Plugin files
+CopyFiles('scripting', 'addons/sourcemod/scripting',
+  [ 'sourcescramble_manager.sp', ]
+)
+
 
 # Copy binaries.
 for cxx_task in Extension.extensions:
