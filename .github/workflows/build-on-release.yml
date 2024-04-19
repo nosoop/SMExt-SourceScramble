@@ -14,14 +14,14 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-20.04
+          - ubuntu-22.04
           - windows-latest
         include:
-          - meta_branch: "1.10-dev"
-            sm_branch: "1.10-dev"
-            spcomp_version: "1.10.x"
+          - meta_branch: "1.11-dev"
+            sm_branch: "1.11-dev"
+            spcomp_version: "1.11.x"
 
-          - os: ubuntu-20.04
+          - os: ubuntu-22.04
             os_short: linux
             package_ext: tar.gz
 
@@ -46,7 +46,7 @@ jobs:
           
       - name: Add msbuild to PATH (Windows)
         if: runner.os == 'Windows'
-        uses: microsoft/setup-msbuild@v1.1
+        uses: microsoft/setup-msbuild@v2
         
       - name: Install (Windows)
         if: runner.os == 'Windows'
@@ -64,14 +64,14 @@ jobs:
           
 
       - name: Fetch Metamod:Source ${{ matrix.meta_branch }}
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: alliedmodders/metamod-source
           ref: ${{ matrix.meta_branch }}
           path: mmsource
 
       - name: Fetch SourceMod ${{ matrix.sm_branch }}
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: alliedmodders/sourcemod
           ref: ${{ matrix.sm_branch }}
@@ -79,13 +79,13 @@ jobs:
           submodules: recursive
 
       - name: Checkout AMBuild
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: alliedmodders/ambuild
           path: ambuild
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
@@ -101,7 +101,7 @@ jobs:
           pip install git+https://github.com/alliedmodders/ambuild
 
       - name: Checkout project
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: src
 
