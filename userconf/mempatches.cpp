@@ -10,7 +10,7 @@ unsigned int g_IgnoreLevel;
 // The parent section type of a platform specific "windows" or "linux" section.
 MemPatchGameConfig::ParseState g_PlatformOnlyState;
 
-ke::AString g_CurrentSection;
+std::string g_CurrentSection;
 MemPatchGameConfig::MemoryPatchInfo *g_CurrentPatchInfo;
 
 /**
@@ -25,7 +25,7 @@ ByteVector ByteVectorFromString(const char* s) {
 	char* p = strtok(s1, "\\x ");
 	while (p) {
 		uint8_t byte = strtol(p, nullptr, 16);
-		payload.append(byte);
+		payload.push_back(byte);
 		p = strtok(nullptr, "\\x ");
 	}
 	free(s1);
@@ -72,7 +72,7 @@ SMCResult MemPatchGameConfig::ReadSMC_NewSection(const SMCStates *states, const 
 	// Handle platform specific sections first.
 	if (IsTargetPlatformSection(name)) {
 		if (g_IgnoreLevel > 0) {
-			smutils->LogError(myself, "Unreachable platform specific section in \"%s\" Function: line: %i col: %i", g_CurrentPatchInfo->signature.chars(), states->line, states->col);
+			smutils->LogError(myself, "Unreachable platform specific section in \"%s\" Function: line: %i col: %i", g_CurrentPatchInfo->signature.c_str(), states->line, states->col);
 			return SMCResult_HaltFail;
 		}
 		
@@ -85,7 +85,7 @@ SMCResult MemPatchGameConfig::ReadSMC_NewSection(const SMCStates *states, const 
 		return SMCResult_Continue;
 	} else if (IsNonTargetPlatformSection(name)) {
 		if (g_PlatformOnlyState != PState_None) {
-			smutils->LogError(myself, "Unreachable platform specific section in \"%s\" Function: line: %i col: %i", g_CurrentPatchInfo->signature.chars(), states->line, states->col);
+			smutils->LogError(myself, "Unreachable platform specific section in \"%s\" Function: line: %i col: %i", g_CurrentPatchInfo->signature.c_str(), states->line, states->col);
 			return SMCResult_HaltFail;
 		}
 		g_IgnoreLevel++;
@@ -168,7 +168,7 @@ SMCResult MemPatchGameConfig::ReadSMC_LeavingSection(const SMCStates *states) {
 	case PState_Runtime:
 		// pop section info
 		g_ParseState = PState_Root;
-		m_MemPatchInfoMap.insert(g_CurrentSection.chars(), g_CurrentPatchInfo);
+		m_MemPatchInfoMap.insert(g_CurrentSection.c_str(), g_CurrentPatchInfo);
 		
 		g_CurrentPatchInfo = nullptr;
 		g_CurrentSection = "";
