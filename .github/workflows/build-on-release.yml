@@ -14,14 +14,14 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-22.04
+          - ubuntu-20.04
           - windows-latest
         include:
           - meta_branch: "1.11-dev"
             sm_branch: "1.11-dev"
             spcomp_version: "1.11.x"
 
-          - os: ubuntu-22.04
+          - os: ubuntu-20.04
             os_short: linux
             package_ext: tar.gz
 
