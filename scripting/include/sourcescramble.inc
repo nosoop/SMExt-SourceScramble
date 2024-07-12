@@ -35,6 +35,9 @@ methodmap MemoryPatch < Handle {
 	/**
 	 * Returns the starting address of the patch, equivalent to the address of the patch's
 	 * dependent signature plus the patch offset.
+	 * 
+	 * @error    Plugin is running on a 64-bit server; SourceMod does not support full usage of
+	 *           64-bit addresses at this time.
 	 */
 	property Address Address {
 		public native get();
@@ -59,6 +62,9 @@ methodmap MemoryBlock < Handle {
 	
 	/**
 	 * Returns the address of the allocated memory block.
+	 * 
+	 * @error    Plugin is running on a 64-bit server; SourceMod does not support full usage of
+	 *           64-bit addresses at this time.
 	 */
 	property Address Address {
 		public native get();
@@ -108,11 +114,17 @@ static stock int GetNumberTypeByteSize(NumberType size) {
 
 /**
  * Returns the physical memory address of a given SourcePawn cell reference.
+ * 
+ * @error    Plugin is running on a 64-bit server; SourceMod does not support full usage of
+ *           64-bit addresses at this time.
  */
 native Address GetAddressOfCell(any& cell);
 
 /**
  * Returns the physical memory address of a given string.
+ * 
+ * @error    Plugin is running on a 64-bit server; SourceMod does not support full usage of
+ *           64-bit addresses at this time.
  */
 native Address GetAddressOfString(char[] array);
 

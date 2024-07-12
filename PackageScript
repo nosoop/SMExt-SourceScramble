@@ -14,6 +14,11 @@ folder_list = [
   #'addons/sourcemod/configs',
 ]
 
+if 'x86_64' in Extension.target_archs:
+  folder_list.extend([
+    'addons/sourcemod/extensions/x64',
+  ])
+
 if Extension.plugins:
   folder_list += [
     'addons/sourcemod/plugins',
@@ -61,7 +66,10 @@ CopyFiles('scripting', 'addons/sourcemod/scripting',
 
 # Copy binaries.
 for cxx_task in Extension.extensions:
-  builder.AddCopy(cxx_task.binary, folder_map['addons/sourcemod/extensions'])
+  if cxx_task.target.arch == 'x86_64':
+    builder.AddCopy(cxx_task.binary, folder_map['addons/sourcemod/extensions/x64'])
+  else:
+    builder.AddCopy(cxx_task.binary, folder_map['addons/sourcemod/extensions'])
 
 # Copy plugins
 for smx_file, smx_entry in Extension.plugins.items():

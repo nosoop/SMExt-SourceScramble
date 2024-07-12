@@ -16,7 +16,7 @@ sourceFiles = [
 # Make sure to edit PackageScript, which copies your files to their appropriate locations
 # Simple extensions do not need to modify past this point.
 
-project = Extension.Library(builder, projectName + '.ext')
+project = Extension.HL2Project(builder, projectName + '.ext')
 
 if os.path.isfile(os.path.join(builder.currentSourcePath, 'sdk', 'smsdk_ext.cpp')):
   # Use the copy included in the project
@@ -27,4 +27,7 @@ else:
 
 project.sources += sourceFiles
 
-Extension.extensions += [builder.Add(project)]
+for cxx in builder.targets:
+  binary = Extension.HL2Config(builder, project, projectName + '.ext', cxx)
+
+Extension.extensions += builder.Add(project)
