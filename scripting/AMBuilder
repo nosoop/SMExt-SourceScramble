@@ -30,9 +30,7 @@ def build_plugin(script_path, smx_file):
   )
 
   # ???
-  (smx_command, smx_outputs) = result
-  out, *_ = smx_outputs
-  Extension.plugins[smx_file] = out
+  Extension.plugins[smx_file], *_ = result
 
 for script_file in pluginFiles:
   script_path = os.path.join(builder.currentSourcePath, script_file)
