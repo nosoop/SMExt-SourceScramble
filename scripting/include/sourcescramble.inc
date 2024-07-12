@@ -81,36 +81,14 @@ methodmap MemoryBlock < Handle {
 	 * Load up to 4 bytes from an offset to the memory block, performing bounds checks to ensure
 	 * reads are contained within the block.
 	 */
-	public int LoadFromOffset(int offset, NumberType size) {
-		if (offset < 0 || offset + GetNumberTypeByteSize(size) > this.Size) {
-			ThrowError("Cannot perform MemoryBlock access of %d bytes at offset %d (limit %d)",
-					GetNumberTypeByteSize(size), offset, this.Size);
-		}
-		return LoadFromAddress(this.Address + view_as<Address>(offset), size);
-	}
+	public native int LoadFromOffset(int offset, NumberType size);
 	
 	/**
 	 * Store up to 4 bytes to an offset to the memory block, performing bounds checks to ensure
 	 * writes are contained within the block.
 	 */
-	public void StoreToOffset(int offset, int data, NumberType size) {
-		if (offset < 0 || offset + GetNumberTypeByteSize(size) > this.Size) {
-			ThrowError("Cannot perform MemoryBlock access of %d bytes at offset %d (limit %d)",
-					GetNumberTypeByteSize(size), offset, this.Size);
-		}
-		StoreToAddress(this.Address + view_as<Address>(offset), data, size);
-	}
+	public native void StoreToOffset(int offset, int data, NumberType size);
 };
-
-static stock int GetNumberTypeByteSize(NumberType size) {
-	switch (size) {
-		case NumberType_Int8: return 1;
-		case NumberType_Int16: return 2;
-		case NumberType_Int32: return 4;
-	}
-	ThrowError("Unknown NumberType %d.  Did the SourceMod developers add some new ones?", size);
-	return 1; // maybe `return (1 << size);` ?
-}
 
 /**
  * Returns the physical memory address of a given SourcePawn cell reference.
