@@ -65,8 +65,8 @@ public SMCResult PatchMemConfigEntry(SMCParser smc, const char[] key, const char
 	if (!patch.Validate()) {
 		PrintToServer("[sourcescramble] Failed to verify patch \"%s\" from \"%s\"", value, key);
 	} else if (patch.Enable()) {
-		PrintToServer("[sourcescramble] Enabled patch \"%s\" from \"%s\" at address: 0x%08X",
-				value, key, patch.Address);
+		PrintToServer("[sourcescramble] Enabled patch \"%s\" from \"%s\"",
+				value, key);
 	}
 	return SMCParse_Continue;
 }
