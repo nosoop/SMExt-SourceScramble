@@ -38,9 +38,19 @@ ByteVector ByteVectorFromString(const char* s) {
  */
 static inline bool IsTargetPlatformSection(const char* name) {
 #if defined WIN32
+#if defined PLATFORM_64BITS
+	return !strcmp(name, "windows64");
+#else
 	return !strcmp(name, "windows");
+#endif // PLATFORM_64BITS
+
 #elif defined _LINUX
+#if defined PLATFORM_64BITS
+	return !strcmp(name, "linux64");
+#else
 	return !strcmp(name, "linux");
+#endif // PLATFORM_64BITS
+
 #elif defined _OSX
 	return !strcmp(name, "mac");
 #endif
@@ -50,13 +60,17 @@ static inline bool IsTargetPlatformSection(const char* name) {
  * Return true if the name is for an operating system but not the current one.
  */
 static inline bool IsNonTargetPlatformSection(const char* name) {
-#if defined WIN32
-	return (!strcmp(name, "linux") || !strcmp(name, "mac"));
-#elif defined _LINUX
-	return (!strcmp(name, "windows") || !strcmp(name, "mac"));
-#elif defined _OSX
-	return (!strcmp(name, "windows") || !strcmp(name, "linux"));
-#endif
+	if (IsTargetPlatformSection(name)) {
+		return false;
+	}
+	/* mutually exclusive with the above */
+	return (
+		!strcmp(name, "windows")
+		|| !strcmp(name, "windows64")
+		|| !strcmp(name, "linux")
+		|| !strcmp(name, "linux64")
+		|| !strcmp(name, "mac")
+	);
 }
 
 /**
