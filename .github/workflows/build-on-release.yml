@@ -16,18 +16,31 @@ jobs:
         os:
           - ubuntu-20.04
           - windows-latest
+        target_arch:
+          - x86
+          - x86_64
         include:
-          - meta_branch: "1.11-dev"
-            sm_branch: "1.11-dev"
+          - meta_branch: "1.12-dev"
+            sm_branch: "1.12-dev"
             spcomp_version: "1.11.x"
 
           - os: ubuntu-20.04
+            target_arch: x86
             os_short: linux
-            package_ext: tar.gz
+
+          - os: ubuntu-20.04
+            target_arch: x86_64
+            os_short: linux64
 
           - os: windows-latest
+            target_arch: x86
             os_short: win
-            package_ext: zip
+            vs_dev_arch: x86
+
+          - os: windows-latest
+            target_arch: x86_64
+            os_short: win64
+            vs_dev_arch: x64
 
     steps:
       - name: Prepare env
@@ -54,7 +67,7 @@ jobs:
         run: |
           :: See https://github.com/microsoft/vswhere/wiki/Find-VC
           for /f "usebackq delims=*" %%i in (`vswhere -latest -property installationPath`) do (
-            call "%%i"\Common7\Tools\vsdevcmd.bat -arch=x86 -host_arch=x64
+            call "%%i"\Common7\Tools\vsdevcmd.bat -arch=${{ matrix.vs_dev_arch }} -host_arch=x64
           )
           
           :: Loop over all environment variables and make them global.
@@ -110,8 +123,41 @@ jobs:
         run: |
           mkdir build
           cd build
-          python3 ../configure.py --sm-path="${{ github.workspace }}/sourcemod" --mms-path="${{ github.workspace }}/mmsource" --symbol-files --enable-optimize
+          python3 ../configure.py --sm-path="${{ github.workspace }}/sourcemod" --mms-path="${{ github.workspace }}/mmsource" --symbol-files --enable-optimize --targets ${{ matrix.target_arch }}
           ambuild
+      - name: Upload Build Artifact
+        id: upload-build-artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.os_short }}-${{ matrix.target_arch }}
+          path: src/build/package
+
+  combine_packages:
+    name: Upload assets for for ${{ matrix.os_short }}
+    needs: [build]
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-20.04
+          - windows-latest
+        include:
+          - os: ubuntu-20.04
+            os_short: linux
+            package_ext: .tar.gz
+          - os: windows-latest
+            os_short: win
+            package_ext: zip
+
+    steps:
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: src/build/package
+          pattern: ${{ matrix.os_short }}*
+          merge-multiple: true
 
       - name: Build Package (Windows)
         if: runner.os == 'Windows'
