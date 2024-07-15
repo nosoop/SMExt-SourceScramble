@@ -16,8 +16,8 @@ jobs:
           - ubuntu-22.04
           - windows-latest
         include:
-          - meta_branch: "1.11-dev"
-            sm_branch: "1.11-dev"
+          - meta_branch: "1.12-dev"
+            sm_branch: "1.12-dev"
             spcomp_version: "1.11.x"
 
           - os: ubuntu-20.04
