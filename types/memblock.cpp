@@ -162,10 +162,13 @@ cell_t sm_MemoryBlockStoreCellToOffset(IPluginContext *pContext, const cell_t *p
 	switch(params[3]) {
 		case NumberType_Int8:
 			*reinterpret_cast<int8_t*>(addr) = value;
+			break;
 		case NumberType_Int16:
 			*reinterpret_cast<int16_t*>(addr) = value;
+			break;
 		case NumberType_Int32:
 			*reinterpret_cast<int32_t*>(addr) = value;
+			break;
 	}
 	return 0;
 }
