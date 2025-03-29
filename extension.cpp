@@ -61,6 +61,7 @@ bool MemPatchExt::SDK_OnLoad(char* error, size_t maxlength, bool late) {
 	g_MemoryBlockType = g_pHandleSys->CreateType("MemoryBlock",
 			&g_MemoryBlockHandler, 0, NULL, NULL, myself->GetIdentity(), NULL);
 	
+	sharesys->RegisterLibrary(myself, "sourcescramble");
 	return true;
 }
 
