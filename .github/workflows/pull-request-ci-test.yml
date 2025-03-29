@@ -20,6 +20,10 @@ jobs:
             sm_branch: "1.11-dev"
             spcomp_version: "1.11.x"
 
+          - sm_version: "1.12"
+            sm_branch: "1.12-dev"
+            spcomp_version: "1.12.x"
+
           - os: ubuntu-20.04
             os_short: linux
 
