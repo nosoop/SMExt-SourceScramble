@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-20.04
+          - ubuntu-22.04
           - windows-latest
         target_arch:
           - x86
@@ -24,11 +24,11 @@ jobs:
             sm_branch: "1.12-dev"
             spcomp_version: "1.11.x"
 
-          - os: ubuntu-20.04
+          - os: ubuntu-22.04
             target_arch: x86
             os_short: linux
 
-          - os: ubuntu-20.04
+          - os: ubuntu-22.04
             target_arch: x86_64
             os_short: linux64
 
@@ -141,10 +141,10 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-20.04
+          - ubuntu-22.04
           - windows-latest
         include:
-          - os: ubuntu-20.04
+          - os: ubuntu-22.04
             os_short: linux
             package_ext: .tar.gz
           - os: windows-latest
