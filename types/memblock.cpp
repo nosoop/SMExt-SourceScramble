@@ -118,16 +118,18 @@ cell_t sm_MemoryBlockLoadCellFromOffset(IPluginContext *pContext, const cell_t *
 	}
 	
 	size_t offset = params[2];
+	cell_t eSize = params[3];
+	
 	size_t span;
-	if (!GetNumberTypeSpan(params[3], span)) {
-		return pContext->ThrowNativeError("Unknown NumberType %d.  Did the SourceMod developers add some new ones?", params[3]);
+	if (!GetNumberTypeSpan(eSize, span)) {
+		return pContext->ThrowNativeError("Unknown NumberType %d.  Did the SourceMod developers add some new ones?", eSize);
 	} else if (offset < 0 || offset + span > pMemoryBlock->size) {
 		return pContext->ThrowNativeError("Cannot perform MemoryBlock access of %d bytes at offset %d (limit %d)",
 					span, offset, pMemoryBlock->size);
 	}
 	
 	uintptr_t addr = reinterpret_cast<uintptr_t>(pMemoryBlock->block) + offset;
-	switch(params[3]) {
+	switch(eSize) {
 		case NumberType_Int8:
 			return *reinterpret_cast<uint8_t*>(addr);
 		case NumberType_Int16:
@@ -150,16 +152,18 @@ cell_t sm_MemoryBlockStoreCellToOffset(IPluginContext *pContext, const cell_t *p
 	
 	size_t offset = params[2];
 	cell_t value = params[3];
+	cell_t eSize = params[4];
+	
 	size_t span;
-	if (!GetNumberTypeSpan(params[4], span)) {
-		return pContext->ThrowNativeError("Unknown NumberType %d.  Did the SourceMod developers add some new ones?", params[3]);
+	if (!GetNumberTypeSpan(eSize, span)) {
+		return pContext->ThrowNativeError("Unknown NumberType %d.  Did the SourceMod developers add some new ones?", eSize);
 	} else if (offset < 0 || offset + span > pMemoryBlock->size) {
 		return pContext->ThrowNativeError("Cannot perform MemoryBlock access of %d bytes at offset %d (limit %d)",
 					span, offset, pMemoryBlock->size);
 	}
 	
 	uintptr_t addr = reinterpret_cast<uintptr_t>(pMemoryBlock->block) + offset;
-	switch(params[3]) {
+	switch(eSize) {
 		case NumberType_Int8:
 			*reinterpret_cast<int8_t*>(addr) = value;
 			break;
