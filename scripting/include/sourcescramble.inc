@@ -42,6 +42,13 @@ methodmap MemoryPatch < Handle {
 	property Address Address {
 		public native get();
 	}
+
+	/**
+	 * Returns true if the patch is currently enabled, else false.
+	 */
+	property bool Enabled {
+		public native get();
+	}
 };
 
 methodmap MemoryBlock < Handle {
