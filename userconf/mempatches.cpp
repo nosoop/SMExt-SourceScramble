@@ -24,7 +24,7 @@ ByteVector ByteVectorFromString(const char* s) {
 	char* s1 = strdup(s);
 	char* p = strtok(s1, "\\x ");
 	while (p) {
-		uint8_t byte = strtol(p, nullptr, 16);
+		uint8_t byte = static_cast<uint8_t>(strtol(p, nullptr, 16));
 		payload.push_back(byte);
 		p = strtok(nullptr, "\\x ");
 	}
@@ -141,26 +141,79 @@ SMCResult MemPatchGameConfig::ReadSMC_KeyValue(const SMCStates *states, const ch
 	{
 	case PState_Runtime:
 		if (!strcmp(key, "signature")) {
-			g_CurrentPatchInfo->signature = value;
-		} else if (!strcmp(key, "offset")) {
-			// Support for IDA-style address offsets
-			if (value[strlen(value)-1] == 'h') {
-				g_CurrentPatchInfo->offset = (size_t) strtol(value, nullptr, 16);
+			if (value && value[0] != '\0') {
+				g_CurrentPatchInfo->signature = value;
 			} else {
-				g_CurrentPatchInfo->offset = atoi(value);
+				smutils->LogError(myself, "Error: empty signature in patch \"%s\" at line %i col %i", \
+					g_CurrentSection.c_str(), states->line, states->col);
+				return SMCResult_HaltFail;
+			}
+		} else if (!strcmp(key, "offset")) {
+			// size_t - supports only unsigned int
+			std::string s(value);
+			char* end = nullptr;
+
+			if (s.empty()) {
+				smutils->LogError(myself, "Error: empty offset in patch \"%s\" at line %i col %i", \
+									g_CurrentSection.c_str(), states->line, states->col);
+				return SMCResult_HaltFail;
+			} else {
+				if (s.back() == 'h' || s.back() == 'H') {
+					// IDA-style hex: "10h"
+					s.pop_back();
+					g_CurrentPatchInfo->offset = strtoul(s.c_str(), &end, 16);
+				} else if (s.rfind("0x", 0) == 0 || s.rfind("0X", 0) == 0) {
+					// C-style hex: "0x10"
+					g_CurrentPatchInfo->offset = strtoul(s.c_str(), &end, 16);
+				} else {
+					// Decimal
+					g_CurrentPatchInfo->offset = strtoul(s.c_str(), &end, 10);
+				}
+
+				if (*end != '\0') {
+					smutils->LogError(myself, "Error: Invalid offset value \"%s\" at line %i col %i",\
+										value, states->line, states->col);
+					return SMCResult_HaltFail;
+				}
 			}
 		} else if (!strcmp(key, "patch")) {
 			g_CurrentPatchInfo->vecPatch = ByteVectorFromString(value);
+
+			if (g_CurrentPatchInfo->vecPatch.size() < 1) {
+				smutils->LogError(myself, "Error: empty patch section in patch \"%s\" at line %i col %i",
+					g_CurrentSection.c_str(), states->line, states->col);
+				return SMCResult_HaltFail;
+			}
 		} else if (!strcmp(key, "verify")) {
 			g_CurrentPatchInfo->vecVerify = ByteVectorFromString(value);
+			
+			if (g_CurrentPatchInfo->vecVerify.size() < 1) {
+				smutils->LogError(myself, "Error: empty verify section in patch \"%s\" at line %i col %i",
+					g_CurrentSection.c_str(), states->line, states->col);
+				return SMCResult_HaltFail;
+			}
 		} else if (!strcmp(key, "preserve")) {
 			g_CurrentPatchInfo->vecPreserve = ByteVectorFromString(value);
+
+			if (g_CurrentPatchInfo->vecPreserve.size() < 1) {
+				smutils->LogError(myself, "Error: empty preserve section in patch \"%s\" at line %i col %i",
+					g_CurrentSection.c_str(), states->line, states->col);
+				return SMCResult_HaltFail;
+			}
+		} else {
+			// Force users to check their gamedata in case something is incorrect.
+			// It's possible that the user made a typo, and the extension doesn't display errors;
+			// This has been verified in practice.
+			smutils->LogError(myself, "Error: unknown key \"%s\" in patch \"%s\" at line %i col %i",
+				key, g_CurrentSection.c_str(), states->line, states->col);
+			return SMCResult_HaltFail;
 		}
 		break;
 	default:
-		smutils->LogError(myself, "Unknown key in MemPatches section \"%s\": line: %i col: %i", key, states->line, states->col);
+		smutils->LogError(myself, "Error: Unknown key in MemPatches section \"%s\": line: %i col: %i", key, states->line, states->col);
 		return SMCResult_HaltFail;
 	}
+
 	return SMCResult_Continue;
 }
 
