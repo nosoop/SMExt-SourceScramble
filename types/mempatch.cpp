@@ -55,7 +55,6 @@ public:
 				SH_MEM_READ | SH_MEM_WRITE | SH_MEM_EXEC);
 		ByteVectorWrite(vecPatch, (uint8_t*) pAddress);
 		
-		// 
 		for (size_t i = 0; i < vecPatch.size(); i++) {
 			uint8_t preserveBits = 0;
 			if (i < vecPreserve.size()) {
@@ -81,15 +80,20 @@ public:
 			return false;
 		}
 		
-		auto addr = (uint8_t*) pAddress;
-		for (size_t i = 0; i < this->vecVerify.size(); i++) {
-			if (vecVerify[i] != '*' && vecVerify[i] != addr[i]) {
+		auto addr = reinterpret_cast<uint8_t*>(pAddress);
+
+		for (size_t i = 0; i < vecVerify.size(); i++) {
+			// wildcard '*' skip
+			if (vecVerify[i] == static_cast<uint8_t>('*')) {
+				continue;
+			}
+
+			if (vecVerify[i] != addr[i]) {
 				return false;
 			}
 		}
 		return true;
 	}
-	
 	~MemoryPatch() {
 		this->Disable();
 	}
@@ -127,7 +131,6 @@ cell_t sm_MemoryPatchLoadFromConfig(IPluginContext *pContext, const cell_t *para
 	if (!pConfig) {
 		return pContext->ThrowNativeError("Invalid game config handle %x (error %d)", hndl, err);
 	}
-	
 	void* addr;
 	if (!pConfig->GetMemSig(info.signature.c_str(), &addr)) {
 		return pContext->ThrowNativeError("Failed to locate signature for '%s' (mempatch '%s')", info.signature.c_str(), name);
@@ -159,7 +162,6 @@ cell_t sm_MemoryPatchEnable(IPluginContext *pContext, const cell_t *params) {
 	if ((err = ReadMemoryPatchHandle(hndl, &pMemoryPatch)) != HandleError_None) {
 		return pContext->ThrowNativeError("Invalid MemoryPatch handle %x (error %d)", hndl, err);
 	}
-	
 	return pMemoryPatch->Enable();
 }
 

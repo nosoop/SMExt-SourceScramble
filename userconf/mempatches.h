@@ -20,6 +20,13 @@ public:
 public:
 	class MemoryPatchInfo {
 	public:
+		MemoryPatchInfo()
+		{
+			// Other class variables are themselves initialized with a default value, 
+			// but this one is not, it contains a garbage value
+			offset = 0;
+		}
+
 		std::string signature;
 		size_t offset;
 		ByteVector vecPatch, vecVerify, vecPreserve;
