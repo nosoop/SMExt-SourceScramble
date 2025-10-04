@@ -143,7 +143,7 @@ cell_t sm_MemoryPatchLoadFromConfig(IPluginContext *pContext, const cell_t *para
 	}
 
 	if (info.vecPatch.empty()) {
-		return pContext->ThrowNativeError("Invalid patch configuration: section `patch` is empty for patch '%s'", name);
+		return pContext->ThrowNativeError("Invalid patch configuration: section 'patch' is empty for patch '%s'", name);
 	}
 
 	if (std::equal(info.vecPatch.begin(), info.vecPatch.end(), (uint8_t*)addr)) {
