@@ -29,15 +29,18 @@ public:
 		for (auto bit : info.vecPatch) {
 			this->vecPatch.push_back(bit);
 		}
+
 		for (auto bit : info.vecVerify) {
 			this->vecVerify.push_back(bit);
 		}
+
 		for (auto bit : info.vecPreserve) {
 			this->vecPreserve.push_back(bit);
 		}
 		
 		// ignore offset if address is bad
 		this->pAddress = pAddress ? pAddress + (info.offset) : 0;
+		strPatchName = info.patchName;
 	}
 	
 	bool Enable() {
@@ -49,6 +52,19 @@ public:
 		if (!this->Verify()) {
 			return false;
 		}
+
+		if (std::equal(vecPatch.begin(), vecPatch.end(), (uint8_t*) pAddress)) {
+			// The bytes in the binary file already match the patch, 
+			// we inform the user that his patch is redundant, 
+			// we tell them to check the patch.
+			// In this case, as a rule, section `verify` is missing.
+			smutils->LogError(myself,
+				"Patch '%s' is redundant. Binary already contains the patch bytes. "
+				"Check patch data or perhaps it was applied by a different plugin?",
+				strPatchName.c_str()
+			);
+		}
+
 		ByteVectorRead(vecRestore, (uint8_t*) pAddress, vecPatch.size());
 		
 		SourceHook::SetMemAccess((void*) this->pAddress, vecPatch.size() * sizeof(uint8_t),
@@ -71,6 +87,7 @@ public:
 			// no memory to restore, fug
 			return;
 		}
+
 		ByteVectorWrite(vecRestore, (uint8_t*) pAddress);
 		vecRestore.clear();
 	}
@@ -94,10 +111,12 @@ public:
 		}
 		return true;
 	}
+
 	~MemoryPatch() {
 		this->Disable();
 	}
-	
+
+	std::string strPatchName; // For error messages
 	uintptr_t pAddress;
 	ByteVector vecPatch, vecRestore, vecVerify, vecPreserve;
 };

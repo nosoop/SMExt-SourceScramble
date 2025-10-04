@@ -235,6 +235,10 @@ SMCResult MemPatchGameConfig::ReadSMC_LeavingSection(const SMCStates *states) {
 	case PState_Runtime:
 		// pop section info
 		g_ParseState = PState_Root;
+
+		// save data for error messages
+		g_CurrentPatchInfo->patchName = g_CurrentSection;
+
 		m_MemPatchInfoMap.insert(g_CurrentSection.c_str(), g_CurrentPatchInfo);
 		
 		g_CurrentPatchInfo = nullptr;

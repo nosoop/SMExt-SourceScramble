@@ -27,6 +27,7 @@ public:
 			offset = 0;
 		}
 
+		std::string patchName;
 		std::string signature;
 		size_t offset;
 		ByteVector vecPatch, vecVerify, vecPreserve;
