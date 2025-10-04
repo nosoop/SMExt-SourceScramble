@@ -29,52 +29,56 @@ public:
 		for (auto bit : info.vecPatch) {
 			this->vecPatch.push_back(bit);
 		}
+
 		for (auto bit : info.vecVerify) {
 			this->vecVerify.push_back(bit);
 		}
+
 		for (auto bit : info.vecPreserve) {
 			this->vecPreserve.push_back(bit);
 		}
-		
+
 		// ignore offset if address is bad
 		this->pAddress = pAddress ? pAddress + (info.offset) : 0;
 	}
-	
+
 	bool Enable() {
 		if (vecRestore.size() > 0) {
 			// already patched, disregard
 			return false;
 		}
-		
+
 		if (!this->Verify()) {
 			return false;
 		}
-		ByteVectorRead(vecRestore, (uint8_t*) pAddress, vecPatch.size());
-		
-		SourceHook::SetMemAccess((void*) this->pAddress, vecPatch.size() * sizeof(uint8_t),
-				SH_MEM_READ | SH_MEM_WRITE | SH_MEM_EXEC);
-		ByteVectorWrite(vecPatch, (uint8_t*) pAddress);
-		
+
+		ByteVectorRead(vecRestore, (uint8_t*)pAddress, vecPatch.size());
+
+		SourceHook::SetMemAccess((void*)this->pAddress, vecPatch.size() * sizeof(uint8_t),
+			SH_MEM_READ | SH_MEM_WRITE | SH_MEM_EXEC);
+		ByteVectorWrite(vecPatch, (uint8_t*)pAddress);
+
 		for (size_t i = 0; i < vecPatch.size(); i++) {
 			uint8_t preserveBits = 0;
 			if (i < vecPreserve.size()) {
 				preserveBits = vecPreserve[i];
 			}
-			*((uint8_t*) pAddress + i) = (vecPatch[i] & ~preserveBits) | (vecRestore[i] & preserveBits);
+			*((uint8_t*)pAddress + i) = (vecPatch[i] & ~preserveBits) | (vecRestore[i] & preserveBits);
 		}
-		
+
 		return true;
 	}
-	
+
 	void Disable() {
 		if (vecRestore.size() == 0) {
 			// no memory to restore, fug
 			return;
 		}
-		ByteVectorWrite(vecRestore, (uint8_t*) pAddress);
+
+		ByteVectorWrite(vecRestore, (uint8_t*)pAddress);
 		vecRestore.clear();
 	}
-	
+
 	bool Verify() {
 		if (!pAddress) {
 			return false;
@@ -94,10 +98,11 @@ public:
 		}
 		return true;
 	}
+
 	~MemoryPatch() {
 		this->Disable();
 	}
-	
+
 	uintptr_t pAddress;
 	ByteVector vecPatch, vecRestore, vecVerify, vecPreserve;
 };
@@ -131,13 +136,30 @@ cell_t sm_MemoryPatchLoadFromConfig(IPluginContext *pContext, const cell_t *para
 	if (!pConfig) {
 		return pContext->ThrowNativeError("Invalid game config handle %x (error %d)", hndl, err);
 	}
+
 	void* addr;
-	if (!pConfig->GetMemSig(info.signature.c_str(), &addr)) {
+	if (!pConfig->GetMemSig(info.signature.c_str(), &addr) || addr == NULL) {
 		return pContext->ThrowNativeError("Failed to locate signature for '%s' (mempatch '%s')", info.signature.c_str(), name);
 	}
-	
+
+	if (info.vecPatch.empty()) {
+		return pContext->ThrowNativeError("Invalid patch configuration: section 'patch' is empty for patch '%s'", name);
+	}
+
+	if (std::equal(info.vecPatch.begin(), info.vecPatch.end(), (uint8_t*)addr)) {
+		// The bytes in the binary file already match the patch, 
+			// we inform the user that his patch is redundant, 
+			// we tell them to check the patch.
+			// In this case, as a rule, section `verify` is missing.
+		smutils->LogError(myself,
+			"Patch '%s' is redundant. Binary already contains the patch bytes. "
+			"Check patch data or perhaps it was applied by a different plugin?",
+			name
+		);
+	}
+
 	MemoryPatch *pMemoryPatch = new MemoryPatch((uintptr_t) addr, info);
-	
+
 	return g_pHandleSys->CreateHandle(g_MemoryPatchType, pMemoryPatch,
 			pContext->GetIdentity(), myself->GetIdentity(), NULL);
 }
