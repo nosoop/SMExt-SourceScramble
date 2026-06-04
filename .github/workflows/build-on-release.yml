@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Build for ${{ matrix.os_short }} using sm-${{ matrix.sm_branch }}
+    name: Build for ${{ matrix.os_short }} (SM ${{ matrix.target_sm_version }})
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -19,10 +19,19 @@ jobs:
         target_arch:
           - x86
           - x86_64
+        target_sm_version:
+          - "1.12"
+          - "1.13"
         include:
-          - meta_branch: "1.12-dev"
+          - spcomp_version: "1.11.x"
+
+          - target_sm_version: "1.12"
             sm_branch: "1.12-dev"
-            spcomp_version: "1.11.x"
+            meta_branch: "1.12-dev"
+
+          - target_sm_version: "1.13"
+            sm_branch: "master"
+            meta_branch: "master"
 
           - os: ubuntu-22.04
             target_arch: x86
@@ -129,11 +138,11 @@ jobs:
         id: upload-build-artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.os_short }}-${{ matrix.target_arch }}
+          name: ${{ matrix.os_short }}-${{ matrix.target_sm_version }}-${{ matrix.target_arch }}
           path: src/build/package
 
   combine_packages:
-    name: Upload assets for for ${{ matrix.os_short }}
+    name: Upload assets for ${{ matrix.os_short }} (SM ${{ matrix.target_sm_version }})
     needs: [build]
     runs-on: ${{ matrix.os }}
 
@@ -143,7 +152,13 @@ jobs:
         os:
           - ubuntu-22.04
           - windows-latest
+        target_sm_version:
+          - "1.12"
+          - "1.13"
         include:
+          - package_suffix: ""
+          - target_sm_version: "1.13"
+            package_suffix: "-api9"
           - os: ubuntu-22.04
             os_short: linux
             package_ext: .tar.gz
@@ -156,7 +171,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: src/build/package
-          pattern: ${{ matrix.os_short }}*
+          pattern: ${{ matrix.os_short }}-${{ matrix.target_sm_version }}*
           merge-multiple: true
 
       - name: Build Package (Windows)
@@ -185,5 +200,5 @@ jobs:
         with:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: src/build/package.${{ matrix.package_ext }}
-          asset_name: package.${{ matrix.package_ext }}
+          asset_name: package${{ matrix.package_suffix }}.${{ matrix.package_ext }}
           asset_content_type: application/octet-stream
