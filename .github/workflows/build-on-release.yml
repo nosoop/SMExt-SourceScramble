@@ -23,6 +23,9 @@ jobs:
           - "1.12"
           - "1.13"
         include:
+          - os: ubuntu-22.04
+            container_image: ghcr.io/alliedmodders/build-containers/debian11-clang22:latest
+
           - spcomp_version: "1.11.x"
 
           - target_sm_version: "1.12"
@@ -51,20 +54,14 @@ jobs:
             os_short: win64
             vs_dev_arch: x64
 
+    container:
+      image: ${{ matrix.container_image }}
+
     steps:
       - name: Prepare env
         shell: bash
         run: |
           echo "GITHUB_SHA_SHORT=${GITHUB_SHA::7}" >> $GITHUB_ENV
-          
-      - name: Install (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          sudo dpkg --add-architecture i386
-          sudo apt-get update
-          sudo apt-get install -y clang g++-multilib
-          echo "CC=clang" >> $GITHUB_ENV
-          echo "CXX=clang++" >> $GITHUB_ENV
           
       - name: Add msbuild to PATH (Windows)
         if: runner.os == 'Windows'
@@ -84,6 +81,12 @@ jobs:
             echo>>"%GITHUB_ENV%" %%a=%%b
           )
           
+
+      - name: Resolve paths
+        id: path_helper
+        shell: bash
+        run: |
+          echo "workspace=$GITHUB_WORKSPACE" >> $GITHUB_OUTPUT
 
       - name: Fetch Metamod:Source ${{ matrix.meta_branch }}
         uses: actions/checkout@v4
@@ -106,8 +109,9 @@ jobs:
           repository: alliedmodders/ambuild
           path: ambuild
 
-      - name: Set up Python
+      - name: Set up Python (Windows)
         uses: actions/setup-python@v5
+        if: runner.os == 'Windows'
         with:
           python-version: '3.x'
 
@@ -117,7 +121,8 @@ jobs:
           version: ${{ matrix.spcomp_version }}
           no-spcomp-proxy: true
 
-      - name: Checkout ambuild
+      - name: Checkout ambuild (Windows) 
+        if: runner.os == 'Windows'
         run: |
           python -m pip install wheel
           pip install git+https://github.com/alliedmodders/ambuild
@@ -132,7 +137,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          python3 ../configure.py --sm-path="${{ github.workspace }}/sourcemod" --mms-path="${{ github.workspace }}/mmsource" --symbol-files --enable-optimize --targets ${{ matrix.target_arch }}
+          python3 ../configure.py --sm-path="${{ steps.path_helper.outputs.workspace }}/sourcemod" --mms-path="${{ steps.path_helper.outputs.workspace }}/mmsource" --symbol-files --enable-optimize --targets ${{ matrix.target_arch }}
           ambuild
       - name: Upload Build Artifact
         id: upload-build-artifact
