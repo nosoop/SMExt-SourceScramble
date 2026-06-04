@@ -6,7 +6,7 @@
 
 #include "extension.h"
 
-#include <sm_stringhashmap.h>
+#include <unordered_map>
 
 using ByteVector = std::vector<uint8_t>;
 
@@ -42,7 +42,7 @@ public:
 	const MemoryPatchInfo* GetInfo(const char *key);
 	
 private:
-	StringHashMap<MemoryPatchInfo*> m_MemPatchInfoMap;
+	std::unordered_map<std::string, MemoryPatchInfo*> m_MemPatchInfoMap;
 };
 
 extern MemPatchGameConfig g_MemPatchConfig;

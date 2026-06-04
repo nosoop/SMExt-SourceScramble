@@ -109,9 +109,9 @@ SMCResult MemPatchGameConfig::ReadSMC_NewSection(const SMCStates *states, const 
 	switch (g_ParseState) {
 		case PState_Root: {
 			// fetch or create new struct, push new state
-			auto sig = m_MemPatchInfoMap.find(name);
-			if (sig.found()) {
-				g_CurrentPatchInfo = sig->value;
+			auto sigfind = m_MemPatchInfoMap.find(name);
+			if (sigfind != m_MemPatchInfoMap.end()) {
+				g_CurrentPatchInfo = sigfind->second;
 			} else {
 				g_CurrentPatchInfo = new MemoryPatchInfo();
 			}
@@ -235,7 +235,7 @@ SMCResult MemPatchGameConfig::ReadSMC_LeavingSection(const SMCStates *states) {
 	case PState_Runtime:
 		// pop section info
 		g_ParseState = PState_Root;
-		m_MemPatchInfoMap.insert(g_CurrentSection.c_str(), g_CurrentPatchInfo);
+		m_MemPatchInfoMap.insert({ g_CurrentSection.c_str(), g_CurrentPatchInfo });
 		
 		g_CurrentPatchInfo = nullptr;
 		g_CurrentSection = "";
@@ -252,9 +252,9 @@ void MemPatchGameConfig::ReadSMC_ParseStart() {
 }
 
 const MemPatchGameConfig::MemoryPatchInfo* MemPatchGameConfig::GetInfo(const char *key) {
-	auto sig = m_MemPatchInfoMap.find(key);
-	if (sig.found()) {
-		return sig->value;
+	auto sigfind = m_MemPatchInfoMap.find(key);
+	if (sigfind != m_MemPatchInfoMap.end()) {
+		return sigfind->second;
 	}
 	return nullptr;
 }
