@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Build for ${{ matrix.os_short }} (SM ${{ matrix.target_sm_version }})
+    name: Build for ${{ matrix.os_short }}-${{ matrix.target_arch }} (SM ${{ matrix.target_sm_version }})
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -37,21 +37,17 @@ jobs:
             meta_branch: "master"
 
           - os: ubuntu-22.04
-            target_arch: x86
             os_short: linux
 
-          - os: ubuntu-22.04
-            target_arch: x86_64
-            os_short: linux64
+          - os: windows-latest
+            os_short: win
 
           - os: windows-latest
             target_arch: x86
-            os_short: win
             vs_dev_arch: x86
 
           - os: windows-latest
             target_arch: x86_64
-            os_short: win64
             vs_dev_arch: x64
 
     container:
@@ -176,7 +172,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: src/build/package
-          pattern: ${{ matrix.os_short }}-${{ matrix.target_sm_version }}*
+          pattern: ${{ matrix.os_short }}-${{ matrix.target_sm_version }}-*
           merge-multiple: true
 
       - name: Build Package (Windows)
