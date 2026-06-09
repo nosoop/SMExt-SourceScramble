@@ -15,6 +15,7 @@ cell_t sm_MemoryPatchEnable(IPluginContext *pContext, const cell_t *params);
 cell_t sm_MemoryPatchDisable(IPluginContext *pContext, const cell_t *params);
 
 cell_t sm_MemoryPatchPropAddressGet(IPluginContext *pContext, const cell_t *params);
+cell_t sm_MemoryIsPatchEnabled(IPluginContext *pContext, const cell_t *params);
 
 const sp_nativeinfo_t g_MemoryPatchNatives[] = {
 	{ "MemoryPatch.CreateFromConf", sm_MemoryPatchLoadFromConfig },
@@ -25,6 +26,7 @@ const sp_nativeinfo_t g_MemoryPatchNatives[] = {
 	{ "MemoryPatch.Disable", sm_MemoryPatchDisable },
 	
 	{ "MemoryPatch.Address.get", sm_MemoryPatchPropAddressGet },
+	{ "MemoryPatch.Enabled.get", sm_MemoryIsPatchEnabled },
 	
 	{NULL, NULL},
 };

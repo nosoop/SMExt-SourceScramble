@@ -62,7 +62,8 @@ public:
 			}
 			*((uint8_t*) pAddress + i) = (vecPatch[i] & ~preserveBits) | (vecRestore[i] & preserveBits);
 		}
-		
+
+		enabled = true;
 		return true;
 	}
 	
@@ -73,8 +74,9 @@ public:
 		}
 		ByteVectorWrite(vecRestore, (uint8_t*) pAddress);
 		vecRestore.clear();
+		enabled = false;
 	}
-	
+
 	bool Verify() {
 		if (!pAddress) {
 			return false;
@@ -100,6 +102,7 @@ public:
 	
 	uintptr_t pAddress;
 	ByteVector vecPatch, vecRestore, vecVerify, vecPreserve;
+	bool enabled;
 };
 
 void MemoryPatchHandler::OnHandleDestroy(HandleType_t type, void* object) {
@@ -192,4 +195,16 @@ cell_t sm_MemoryPatchPropAddressGet(IPluginContext *pContext, const cell_t *para
 #else
 	return pContext->ThrowNativeError("MemoryPatch.Address is not implemented for 64-bit platforms");
 #endif
+}
+
+cell_t sm_MemoryIsPatchEnabled(IPluginContext *pContext, const cell_t *params) {
+	Handle_t hndl = static_cast<Handle_t>(params[1]);
+	
+	MemoryPatch *pMemoryPatch;
+	HandleError err;
+	if ((err = ReadMemoryPatchHandle(hndl, &pMemoryPatch)) != HandleError_None) {
+		return pContext->ThrowNativeError("Invalid MemoryPatch handle %x (error %d)", hndl, err);
+	}
+	
+	return (cell_t)pMemoryPatch->enabled;
 }
