@@ -159,7 +159,7 @@ jobs:
         include:
           - package_suffix: ""
           - target_sm_version: "1.13"
-            package_suffix: "-api9"
+            package_suffix: "-api10"
           - os: ubuntu-22.04
             os_short: linux
             package_ext: .tar.gz
