@@ -298,6 +298,7 @@ class ExtensionConfig(ScriptingMixin, object):
     elif cxx.family == 'clang':
       cxx.linkflags += ['-lgcc_eh']
     cxx.linkflags += ['-static-libstdc++']
+    cxx.linkflags += ['-Wl,--exclude-libs,ALL']
 
   def configure_mac(self, cxx):
     cxx.defines += ['OSX', '_OSX', 'POSIX', 'KE_ABSOLUTELY_NO_STL']
