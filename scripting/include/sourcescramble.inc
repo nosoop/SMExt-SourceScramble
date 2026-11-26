@@ -123,5 +123,18 @@ public Extension __ext_sourcescramble = {
 
 #if !defined REQUIRE_EXTENSIONS
 public void __ext_sourcescramble_SetNTVOptional() {
+	MarkNativeAsOptional("MemoryPatch.CreateFromConf");
+	MarkNativeAsOptional("MemoryPatch.Validate");
+	MarkNativeAsOptional("MemoryPatch.Enable");
+	MarkNativeAsOptional("MemoryPatch.Disable");
+	MarkNativeAsOptional("MemoryPatch.Address.get");
+	MarkNativeAsOptional("MemoryBlock.MemoryBlock");
+	MarkNativeAsOptional("MemoryBlock.LoadFromOffset");
+	MarkNativeAsOptional("MemoryBlock.StoreToOffset");
+	MarkNativeAsOptional("MemoryBlock.Address.get");
+	MarkNativeAsOptional("MemoryBlock.Size.get");
+	MarkNativeAsOptional("MemoryBlock.Disown");
+	MarkNativeAsOptional("GetAddressOfCell");
+	MarkNativeAsOptional("GetAddressOfString");
 }
 #endif
